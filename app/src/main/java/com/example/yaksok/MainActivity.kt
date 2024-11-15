@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yaksok.ui.AddFriendToYaksokPage
+import com.example.yaksok.ui.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "login",
+                        startDestination = "addFriends",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -62,6 +63,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("addFriendToYaksok") {
                             AddFriendToYaksokPage(friendList = friendList)
+                        }
+                        composable("addFriends") {
+                            AddFriendsPage()
                         }
                     }
                 }
