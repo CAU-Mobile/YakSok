@@ -26,11 +26,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.yaksok.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar(navController: NavController) {
+    val currentBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry.value?.destination?.route
+
     TopAppBar(
         navigationIcon = {
             IconButton(onClick = { navController.navigateUp() }) {
@@ -41,10 +45,21 @@ fun CommonTopAppBar(navController: NavController) {
             }
         },
         title = { Spacer(modifier = Modifier.width(0.dp)) }, // 빈 공간으로 사실상 title 제거
+        actions = {
+            // 현재 페이지가 MapPage일 때만 버튼을 표시
+            if (currentRoute == "map") {
+                IconButton(onClick = {
+                    // 친구 추가 동작
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.addfriend), // 친구 추가 아이콘
+                        contentDescription = "Add Friend"
+                    )
+                }
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent // 배경색 설정
         )
     )
 }
-
-

@@ -41,7 +41,9 @@ class MainActivity : ComponentActivity() {
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        composable("map") { MapPage() }
+                        composable("map") {
+                            MapPage()
+                        }
                         composable("login") {
                             LoginPage(goToRegisterPage = { navController.navigate("register") })
                         }
