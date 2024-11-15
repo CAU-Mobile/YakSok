@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "addFriendToYaksok",
+                        startDestination = "login",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {

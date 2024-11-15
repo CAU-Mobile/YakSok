@@ -59,7 +59,7 @@ fun CommonTopAppBar(navController: NavController) {
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent // 배경색 설정
+            containerColor = Color.White // 배경색 설정
         )
     )
 }

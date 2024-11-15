@@ -59,12 +59,19 @@ fun AddFriendToYaksokPage(friendList: List<String>) {
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(5.dp))
             Text(
                 text = "${friendList.size}명의 친구",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Light,
                 color = Color.Gray
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = "약속에 추가할 친구를 선택하세요.",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Light,
+                color = Color.LightGray
             )
         }
         items(friendList) { friend ->

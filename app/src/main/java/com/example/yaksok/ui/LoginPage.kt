@@ -1,6 +1,7 @@
 package com.example.yaksok.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +20,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,7 +37,7 @@ fun LoginPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(223, 242, 235))
+                .background(Color.White)
                 .padding(innerPadding)
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -43,7 +46,9 @@ fun LoginPage(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
+//                    .background(Color.White)
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
 
@@ -61,7 +66,7 @@ fun LoginPage(
                 Text(
                     text = "서비스 사용을 위해 로그인 해주세요.",
                     fontSize = 16.sp,
-                    color = Color.Black
+                    color = Color.Gray,
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -69,10 +74,15 @@ fun LoginPage(
                 TextField(
                     value = "",
                     onValueChange = {},
-                    placeholder = { Text("아이디") },
+                    placeholder = {
+                        Text(
+                            text = "아이디",
+                            color = Color.LightGray,
+                        ) },
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
+                        containerColor = Color(240, 240,240),
                         focusedIndicatorColor = Color.Transparent, // 포커스된 상태의 인디케이터 색상 제거
                         unfocusedIndicatorColor = Color.Transparent // 포커스되지 않은 상태의 인디케이터 색상 제거
                     )
@@ -84,9 +94,15 @@ fun LoginPage(
                 TextField(
                     value = "",
                     onValueChange = {},
-                    placeholder = { Text("비밀번호") },
+                    placeholder = {
+                        Text(
+                            text = "비밀번호",
+                            color = Color.LightGray,
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
+                        containerColor = Color(240, 240,240),
                         focusedIndicatorColor = Color.Transparent, // 포커스된 상태의 인디케이터 색상 제거
                         unfocusedIndicatorColor = Color.Transparent // 포커스되지 않은 상태의 인디케이터 색상 제거
                     )
@@ -106,9 +122,12 @@ fun LoginPage(
                 Button(
                     onClick = goToRegisterPage,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                 ) {
-                    Text("회원가입")
+                    Text(
+                        text = "회원가입",
+                        color = Color(122, 178, 211)
+                    )
                 }
             }
         }
