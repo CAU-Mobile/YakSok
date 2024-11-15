@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yaksok.ui.AddFriendToYaksokPage
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
@@ -28,6 +29,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             YakSokTheme {
                 val navController = rememberNavController()
+                val friendList = listOf("박수빈", "박예빈", "임결", "최지원", "이준우",
+                    "박수빈", "박예빈", "임결", "최지원", "이준우")
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -38,7 +41,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "createYaksok",
+                        startDestination = "addFriendToYaksok",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -56,6 +59,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("createYaksok") {
                             CreateYaksokPage()
+                        }
+                        composable("addFriendToYaksok") {
+                            AddFriendToYaksokPage(friendList = friendList)
                         }
                     }
                 }
