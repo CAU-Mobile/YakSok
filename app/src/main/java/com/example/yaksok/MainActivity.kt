@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "map",
+                        startDestination = "createYaksok",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -52,6 +53,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("manageYaksok") {
                             ManageYaksokPage()
+                        }
+                        composable("createYaksok") {
+                            CreateYaksokPage()
                         }
                     }
                 }
