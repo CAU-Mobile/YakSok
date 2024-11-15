@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yaksok.ui.LoginPage
+import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
 import com.example.yaksok.ui.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
@@ -35,7 +36,9 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "login",
+
+                        startDestination = "manageYaksok",
+
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("map") { MapPage() }
@@ -44,6 +47,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("register") {
                             RegisterPage(goToLoginPage = { navController.navigate("login") })
+                        }
+                        composable("manageYaksok") {
+                            ManageYaksokPage()
                         }
                     }
                 }
