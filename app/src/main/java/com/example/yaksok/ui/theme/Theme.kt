@@ -52,7 +52,7 @@ fun YakSokTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = CustomTypography, // Custom typography 적용
         content = content
     )
 }
