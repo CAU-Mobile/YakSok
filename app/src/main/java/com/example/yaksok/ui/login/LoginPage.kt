@@ -1,4 +1,4 @@
-package com.example.yaksok.ui
+package com.example.yaksok.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,19 +19,39 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.yaksok.query.AuthQuery
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginPage(
-    goToRegisterPage: () -> Unit
+    goToRegisterPage: () -> Unit,
+    viewModel: LoginViewModel,
+    onLoginSuccess: () -> Unit
 ) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var loginMessage by remember { mutableStateOf("") }
+
+    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+
+    if (isLoggedIn) {
+        onLoginSuccess()
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -48,7 +69,7 @@ fun LoginPage(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(16.dp))
                     .border(1.dp, Color.LightGray, RoundedCornerShape(16.dp))
-//                    .background(Color.White)
+//                   .background(Color.White)
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
 
@@ -70,15 +91,16 @@ fun LoginPage(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 아이디 입력 필드
+                // 이메일 입력 필드
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = email,
+                    onValueChange = {email=it},
                     placeholder = {
                         Text(
-                            text = "아이디",
+                            text = "이메일",
                             color = Color.LightGray,
                         ) },
+                    keyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
@@ -92,14 +114,16 @@ fun LoginPage(
 
                 // 비밀번호 입력 필드
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = password,
+                    onValueChange = {password=it},
                     placeholder = {
                         Text(
                             text = "비밀번호",
                             color = Color.LightGray,
                         )
                     },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
                         containerColor = Color(240, 240,240),
@@ -111,7 +135,9 @@ fun LoginPage(
 
                 // 로그인 버튼
                 Button(
-                    onClick = {  },
+                    onClick = {
+                        viewModel.login(email, password) // ViewModel 호출
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
                 ) {
@@ -129,12 +155,24 @@ fun LoginPage(
                         color = Color(122, 178, 211)
                     )
                 }
+
+                if (loginMessage.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = loginMessage,
+                        color = if (loginMessage.contains("로그인 성공")) Color.Blue else Color.Red
+                    )
+                }
             }
         }
     }
 
     @Composable
     fun RegisterScreen() {
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var registerMessage by remember { mutableStateOf("") }
+
         Scaffold(
             modifier = Modifier.fillMaxSize()
         ) { innerPadding ->
@@ -172,19 +210,19 @@ fun LoginPage(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // 아이디 입력 필드
+                    // 이메일  입력 필드
                     TextField(
-                        value = "",
-                        onValueChange = {},
-                        placeholder = { Text("아이디") },
+                        value = email,
+                        onValueChange = {email=it},
+                        placeholder = { Text("이메일") },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // 비밀번호 입력 필드
                     TextField(
-                        value = "",
-                        onValueChange = {},
+                        value = password,
+                        onValueChange = {password=it},
                         placeholder = { Text("비밀번호") },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -192,10 +230,21 @@ fun LoginPage(
 
                     // 회원가입 버튼
                     Button(
-                        onClick = {},
+                        onClick = {
+                            AuthQuery.registerWithEmailAndPassword(email, password) {isSuccess, message ->
+                                registerMessage = message ?: ""
+                            }
+                                  },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("회원가입")
+                    }
+                    if (registerMessage.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = registerMessage,
+                            color = if (registerMessage.contains("회원가입 성공")) Color.Green else Color.Red
+                        )
                     }
                 }
             }

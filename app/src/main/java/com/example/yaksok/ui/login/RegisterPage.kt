@@ -1,4 +1,4 @@
-package com.example.yaksok.ui
+package com.example.yaksok.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
@@ -19,19 +20,31 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.yaksok.query.AuthQuery
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterPage(
     goToLoginPage: () -> Unit
 ) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var registerMessage by remember { mutableStateOf("") }
+    var tellnumber by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -73,14 +86,15 @@ fun RegisterPage(
 
                 // 아이디 입력 필드
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = email,
+                    onValueChange = {email=it},
                     placeholder = {
                         Text(
-                            text = "아이디",
+                            text = "이메일",
                             color = Color.LightGray
                         )
                     },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
                         containerColor = Color(240, 240, 240),
@@ -92,14 +106,16 @@ fun RegisterPage(
 
                 // 비밀번호 입력 필드
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = password,
+                    onValueChange = {password=it},
                     placeholder = {
                         Text(
                             text = "비밀번호",
                             color = Color.LightGray
                         )
                     },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
                         containerColor = Color(240, 240, 240),
@@ -116,8 +132,8 @@ fun RegisterPage(
                 Spacer(modifier = Modifier.height(12.dp))
                 // 이름 입력 필드
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = username,
+                    onValueChange = {username= it},
                     placeholder = {
                         Text(
                             text = "이름",
@@ -134,8 +150,8 @@ fun RegisterPage(
                 Spacer(modifier = Modifier.height(8.dp))
                 // 전화번호 입력 필드
                 TextField(
-                    value = "",
-                    onValueChange = {},
+                    value = tellnumber,
+                    onValueChange = {tellnumber=it},
                     placeholder = {
                         Text(
                             text = "전화번호",
@@ -152,11 +168,22 @@ fun RegisterPage(
                 Spacer(modifier = Modifier.height(30.dp))
                 // 회원가입 버튼
                 Button(
-                    onClick = {},
+                    onClick = {
+                        AuthQuery.registerWithEmailAndPassword(email, password) { isSuccess, message ->
+                        registerMessage = message ?: ""
+                    }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
                 ) {
                     Text("회원가입")
+                }
+                if (registerMessage.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = registerMessage,
+                        color = if (registerMessage.contains("회원가입 성공")) Color.Green else Color.Red
+                    )
                 }
             }
         }

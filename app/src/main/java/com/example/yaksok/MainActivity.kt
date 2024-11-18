@@ -1,6 +1,7 @@
 package com.example.yaksok
 
 import android.os.Bundle
+import com.example.yaksok.ui.login.LoginPage
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,12 +16,13 @@ import androidx.navigation.compose.rememberNavController
 import com.example.yaksok.ui.AddFriendToYaksokPage
 import com.example.yaksok.ui.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
-import com.example.yaksok.ui.LoginPage
+import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
-import com.example.yaksok.ui.RegisterPage
+import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
+import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,6 +34,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val friendList = listOf("박수빈", "박예빈", "임결", "최지원", "이준우",
                     "박수빈", "박예빈", "임결", "최지원", "이준우")
+                val loginViewModel = LoginViewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -42,7 +45,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "addFriends",
+                        startDestination = "login",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -50,7 +53,11 @@ class MainActivity : ComponentActivity() {
                             MapPage()
                         }
                         composable("login") {
-                            LoginPage(goToRegisterPage = { navController.navigate("register") })
+                            LoginPage(
+                                goToRegisterPage = { navController.navigate("register") },
+                                viewModel = loginViewModel,
+                                onLoginSuccess = { navController.navigate("map") }//로그인 성공시 이동
+                            )
                         }
                         composable("register") {
                             RegisterPage(goToLoginPage = { navController.navigate("login") })
