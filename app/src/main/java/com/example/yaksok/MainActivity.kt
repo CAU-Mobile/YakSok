@@ -23,6 +23,7 @@ import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
 import com.example.yaksok.ui.login.LoginViewModel
+import com.example.yaksok.ui.login.RegisterViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
                 val friendList = listOf("박수빈", "박예빈", "임결", "최지원", "이준우",
                     "박수빈", "박예빈", "임결", "최지원", "이준우")
                 val loginViewModel = LoginViewModel()
+                val registerViewModel= RegisterViewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -60,7 +62,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("register") {
-                            RegisterPage(goToLoginPage = { navController.navigate("login") })
+                            RegisterPage(
+                                goToLoginPage = { navController.navigate("login") },
+                                viewModel = registerViewModel
+                            )
                         }
                         composable("manageYaksok") {
                             ManageYaksokPage()

@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,18 +34,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.example.yaksok.query.AuthQuery
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterPage(
-    goToLoginPage: () -> Unit
+    goToLoginPage: () -> Unit,
+    viewModel: RegisterViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var registerMessage by remember { mutableStateOf("") }
-    var tellnumber by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
+    val registerStatus by viewModel.registerStatus.collectAsState()
+    val registerError by viewModel.registerError.collectAsState()
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
@@ -132,8 +139,8 @@ fun RegisterPage(
                 Spacer(modifier = Modifier.height(12.dp))
                 // 이름 입력 필드
                 TextField(
-                    value = username,
-                    onValueChange = {username= it},
+                    value = name,
+                    onValueChange = {name=it},
                     placeholder = {
                         Text(
                             text = "이름",
@@ -150,8 +157,8 @@ fun RegisterPage(
                 Spacer(modifier = Modifier.height(8.dp))
                 // 전화번호 입력 필드
                 TextField(
-                    value = tellnumber,
-                    onValueChange = {tellnumber=it},
+                    value = phoneNumber,
+                    onValueChange = {phoneNumber=it},
                     placeholder = {
                         Text(
                             text = "전화번호",
@@ -169,9 +176,7 @@ fun RegisterPage(
                 // 회원가입 버튼
                 Button(
                     onClick = {
-                        AuthQuery.registerWithEmailAndPassword(email, password) { isSuccess, message ->
-                        registerMessage = message ?: ""
-                    }
+                        viewModel.register(email, password, name, phoneNumber)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
@@ -186,6 +191,29 @@ fun RegisterPage(
                     )
                 }
             }
+        }
+    }
+    //회원가입 확인 메세지 추가~
+    if (showSuccessDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("회원가입 완료") },
+            text = { Text("회원가입이 성공적으로 완료되었습니다!") },
+            confirmButton = {
+                Button(onClick = {
+                    showSuccessDialog = false
+                    goToLoginPage() // 회원가입 성공 후 로그인 페이지로 이동
+                }) {
+                    Text("확인")
+                }
+            }
+        )
+    }
+
+    registerStatus?.let { isSuccess ->
+        if (isSuccess) {
+            showSuccessDialog = true
+            viewModel.clearRegisterState() // 상태 초기화
         }
     }
 }

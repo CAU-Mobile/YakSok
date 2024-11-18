@@ -64,6 +64,17 @@ class UsersQuery {
                     callBack(false, null, it.toString())
                 }
         }
+        fun checkUserExists(
+            userId: String,
+            callBack: (Boolean) -> Unit
+        ) {
+            usersCollection.document(userId).get()
+                .addOnSuccessListener { document ->
+                    callBack(document.exists())//존재시 true 반환
+                }.addOnFailureListener {
+                    callBack(false)
+                }
+        }
 
         fun updateUser(
             userId: String,
