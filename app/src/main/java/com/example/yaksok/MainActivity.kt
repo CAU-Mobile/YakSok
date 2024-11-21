@@ -19,6 +19,7 @@ import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
+import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
@@ -58,7 +59,8 @@ class MainActivity : ComponentActivity() {
                             LoginPage(
                                 goToRegisterPage = { navController.navigate("register") },
                                 viewModel = loginViewModel,
-                                onLoginSuccess = { navController.navigate("map") }//로그인 성공시 이동
+                                onLoginSuccess = { navController.navigate("map") },//로그인 성공시 이동
+                                goToMapPage = { navController.navigate("map") }
                             )
                         }
                         composable("register") {
