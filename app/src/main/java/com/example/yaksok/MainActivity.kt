@@ -19,6 +19,7 @@ import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
+import com.example.yaksok.ui.SavedPlacesPage
 import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
@@ -83,6 +84,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("yaksokDetail") {
                             YaksokDetailPage()
+                        }
+                        composable("savedPlaces") {
+                            SavedPlacesPage()
                         }
                     }
                 }
