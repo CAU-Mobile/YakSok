@@ -19,6 +19,7 @@ import com.example.yaksok.ui.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
 import com.example.yaksok.ui.RegisterPage
+import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
 import com.example.yaksok.ui.theme.YakSokTheme
@@ -42,7 +43,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "addFriends",
+                        startDestination = "addFriendToYaksok",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -66,6 +67,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("addFriends") {
                             AddFriendsPage()
+                        }
+                        composable("yaksokDetail") {
+                            YaksokDetailPage()
                         }
                     }
                 }
