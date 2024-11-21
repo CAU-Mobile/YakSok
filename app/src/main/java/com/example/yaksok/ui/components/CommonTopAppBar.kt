@@ -31,7 +31,10 @@ import com.example.yaksok.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommonTopAppBar(navController: NavController) {
+fun CommonTopAppBar(
+    navController: NavController,
+    goToAddFriendsPage: () -> Unit
+) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.destination?.route
 
@@ -48,9 +51,7 @@ fun CommonTopAppBar(navController: NavController) {
         actions = {
             // 현재 페이지가 MapPage일 때만 버튼을 표시
             if (currentRoute == "map") {
-                IconButton(onClick = {
-                    // 친구 추가 동작
-                }) {
+                IconButton(onClick = goToAddFriendsPage) {
                     Icon(
                         painter = painterResource(id = R.drawable.addfriend), // 친구 추가 아이콘
                         contentDescription = "Add Friend"
