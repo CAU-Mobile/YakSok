@@ -48,10 +48,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFriendsPage () {
+fun AddFriendsPage() {
+    var showSuccessDialog by remember { mutableStateOf(false) }
+    var friendCode by remember { mutableStateOf("") } // TextField 상태 관리
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,23 +69,24 @@ fun AddFriendsPage () {
             text = "친구 추가",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(58,58,58)
+            color = Color(58, 58, 58)
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        // 친구 코드 입력 TextField
         TextField(
-            value = "",
-            onValueChange = { },
+            value = friendCode, // TextField 상태 사용
+            onValueChange = { friendCode = it },
             placeholder = {
-                Row( // Row를 사용하여 아이콘과 텍스트를 가로 정렬
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "search",
-                        modifier = Modifier
-                            .size(24.dp)
+                        modifier = Modifier.size(24.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp)) // 아이콘과 텍스트 사이 간격
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "친구의 코드를 입력해주세요!",
                         color = Color.LightGray
@@ -88,17 +96,38 @@ fun AddFriendsPage () {
             modifier = Modifier.fillMaxWidth(),
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(240, 240, 240),
-                focusedIndicatorColor = Color.Transparent, // 포커스된 상태의 인디케이터 색상 제거
-                unfocusedIndicatorColor = Color.Transparent // 포커스되지 않은 상태의 인디케이터 색상 제거
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
             )
         )
         Spacer(modifier = Modifier.height(16.dp))
+
+        // 친구 추가 버튼
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { showSuccessDialog = true },
             modifier = Modifier.align(Alignment.End),
             colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211)),
         ) {
             Text("친구 추가")
         }
+    }
+
+    // 성공 다이얼로그
+    if (showSuccessDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("친구 추가") }, // 제목 수정
+            text = { Text("친구가 성공적으로 추가되었습니다!") }, // 본문 수정
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSuccessDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
+                ) {
+                    Text("확인")
+                }
+            }
+        )
     }
 }
