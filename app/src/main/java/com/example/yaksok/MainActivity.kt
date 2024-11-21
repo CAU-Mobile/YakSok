@@ -79,6 +79,9 @@ class MainActivity : ComponentActivity() {
                         composable("addFriends") {
                             AddFriendsPage()
                         }
+                        composable("yaksokDetail") {
+                            YaksokDetailPage()
+                        }
                     }
                 }
             }
