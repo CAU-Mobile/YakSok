@@ -13,15 +13,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yaksok.ui.AddFriendToYaksokPage
-import com.example.yaksok.ui.AddFriendsPage
+import com.example.yaksok.ui.friend.AddFriendToYaksokPage
+import com.example.yaksok.ui.friend.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
-import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
+import com.example.yaksok.ui.friend.AddFriendViewModel
 import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
                     "박수빈", "박예빈", "임결", "최지원", "이준우")
                 val loginViewModel = LoginViewModel()
                 val registerViewModel= RegisterViewModel()
+                val AddFriendViewModel= AddFriendViewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -47,8 +48,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "login",
-
+                        startDestination = "addFriends",
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("map") {
@@ -77,7 +77,9 @@ class MainActivity : ComponentActivity() {
                             AddFriendToYaksokPage(friendList = friendList)
                         }
                         composable("addFriends") {
-                            AddFriendsPage()
+                            AddFriendsPage(
+                                viewModel = AddFriendViewModel
+                            )
                         }
                     }
                 }
