@@ -43,7 +43,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.Transparent, // Scaffold 배경색 투명 설정
                     bottomBar = { CommonBottomAppBar(navController) },
-                    topBar = { CommonTopAppBar(navController) }
+                    topBar = {
+                        CommonTopAppBar(
+                            navController = navController,
+                            goToAddFriendsPage = { navController.navigate("addFriends") }
+                        )
+                    }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
@@ -52,7 +57,9 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("map") {
-                            MapPage()
+                            MapPage(
+                                goToCreateYaksokPage = { navController.navigate("createYaksok") }
+                            )
                         }
                         composable("login") {
                             LoginPage(
