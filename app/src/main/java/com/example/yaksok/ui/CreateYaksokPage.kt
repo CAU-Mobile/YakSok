@@ -42,7 +42,7 @@ fun CreateYaksokPage() {
             text = "약속 만들기",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color(58,58,58)
         )
 
         Column(

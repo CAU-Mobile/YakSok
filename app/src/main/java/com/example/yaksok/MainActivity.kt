@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "manageYaksok",
+                        startDestination = "yaksokDetail",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {

@@ -50,7 +50,7 @@ fun MapPage() {
         ) {
             Text(
                 text = "Map Page",
-                color = Color.Black
+                color = Color(58,58,58)
             )
         }
 

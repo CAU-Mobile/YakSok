@@ -62,7 +62,7 @@ fun AddFriendsPage () {
             text = "친구 추가",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color(58,58,58)
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(

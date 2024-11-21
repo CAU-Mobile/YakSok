@@ -81,7 +81,7 @@ fun LoginPage(
                     text = "약속어때",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black // 색상은 이미지 참고하여 설정
+                    color = Color(58,58,58) // 색상은 이미지 참고하여 설정
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 

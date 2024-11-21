@@ -42,7 +42,7 @@ fun ManageYaksokPage(
             text = "나의 약속",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color(58,58,58)
         )
         Column(
             modifier = Modifier
@@ -64,7 +64,7 @@ fun ManageYaksokPage(
                         text = "약속 이름",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Light,
-                        color = Color.Black
+                        color = Color(58,58,58)
                     )
                     Text(
                         text = "약속 장소",

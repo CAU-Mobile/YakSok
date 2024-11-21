@@ -46,7 +46,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,77 +57,132 @@ fun YaksokDetailPage() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(16.dp)
+            .padding(25.dp)
     ) {
         Text(
             text = "약속 상세",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color(58,58,58)
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "약속 이름",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
+        Column (
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color(233,233,233))
+//                .border(2.dp, Color.Gray, RoundedCornerShape(20.dp))
+                .padding(25.dp)
+                .verticalScroll(rememberScrollState())
+
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 시간",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 장소",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 내용",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 참여자",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 참여자",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 참여자",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 참여자",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "약속 참여자",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
+        {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+
+                ) {
+                Text(
+                    text = "학생회 모임",
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(58,58,58)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "2024-12-25",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color.Gray
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            // 선 긋기
+            Divider(
+                color = Color.LightGray,      // 선 색상
+                thickness = 1.dp,        // 선 두께
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Column( modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(5.dp))
+            ) {
+                Text(
+                    text = "낫투두 낫토앤바 용산점"
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Image(
+                    painter = painterResource(id = R.drawable.yaksok_place_img),
+                    contentDescription = "약속 장소",
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+//                    .clip(RoundedCornerShape(5.dp))
+                    .border(BorderStroke(1.dp, Color.LightGray))
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "밥을 먹는다. \n영화를 본다. \n노래방을 간다.",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.ExtraLight,
+                    color = Color(58,58,58)
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Column {
+                 Text(
+                    text = "약속 참여자",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(58,58,58)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ){
+                     repeat(4) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.profile),
+                                contentDescription = "약속 참여자",
+                                modifier = Modifier.size(30.dp)
+                            )
+                            Text(
+                                text = "박수빈",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Light,
+                                color = Color(58,58,58)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "010-1234-5678",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Light,
+                                color = Color(58,58,58)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+                }
+            }
+        }
     }
+}
+
+
+@Preview
+@Composable
+fun YaksokDetailPagePreview() {
+    YaksokDetailPage()
 }

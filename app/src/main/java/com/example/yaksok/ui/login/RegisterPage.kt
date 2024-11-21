@@ -79,7 +79,7 @@ fun RegisterPage(
                     text = "Welcome!",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color(58,58,58)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 

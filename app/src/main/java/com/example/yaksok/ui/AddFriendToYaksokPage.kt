@@ -57,7 +57,7 @@ fun AddFriendToYaksokPage(friendList: List<String>) {
                 text = "친구 목록",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color(58,58,58)
             )
             Spacer(modifier = Modifier.height(5.dp))
             Text(
@@ -100,7 +100,7 @@ fun AddFriendToYaksokPage(friendList: List<String>) {
                         text = friend,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Light,
-                        color = Color.Black
+                        color = Color(58,58,58)
                     )
                     Text(
                         text = "010-1234-5678",
