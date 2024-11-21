@@ -34,7 +34,9 @@ import com.example.yaksok.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapPage() {
+fun MapPage(
+    goToCreateYaksokPage: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +59,7 @@ fun MapPage() {
         // Floating Action Button (FAB)
         FloatingActionButton(
             onClick = {
-                // FAB 클릭 시 동작
+                goToCreateYaksokPage()
             },
             containerColor = Color.Gray, // FAB 배경색
             contentColor = Color.White, // 아이콘 색상
@@ -73,9 +75,3 @@ fun MapPage() {
     }
 }
 
-
-@Preview
-@Composable
-fun MapPagePreview() {
-    MapPage()
-}

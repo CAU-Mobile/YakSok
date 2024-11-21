@@ -21,6 +21,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +35,12 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateYaksokPage() {
+fun CreateYaksokPage(
+    goToManageYaksokPage: () -> Unit,
+    goToAddFriendToYaksokPage: () -> Unit
+) {
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -105,7 +114,7 @@ fun CreateYaksokPage() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { },
+                onClick = { goToAddFriendToYaksokPage() },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 border = BorderStroke(2.dp, Color.Gray),
@@ -119,7 +128,8 @@ fun CreateYaksokPage() {
 
         // '약속 만들기' 버튼을 화면 하단에 배치
         Button(
-            onClick = { },
+            onClick = { showSuccessDialog = true },
+            //todo -> 이동하면서 데이터를 넘겨줘야함.
             modifier = Modifier
                 .padding(vertical = 16.dp), // 버튼 상하 간격 조정
             contentPadding = PaddingValues(20.dp),
@@ -127,5 +137,24 @@ fun CreateYaksokPage() {
         ) {
             Text("약속 만들기")
         }
+    }
+
+    if(showSuccessDialog){
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("약속 만들기") },
+            text = { Text("약속이 성공적으로 만들어졌습니다.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSuccessDialog = false
+                        goToManageYaksokPage()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
+                ) {
+                    Text("확인")
+                }
+            }
+        )
     }
 }

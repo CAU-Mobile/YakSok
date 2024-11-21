@@ -48,9 +48,8 @@ fun CommonTopAppBar(navController: NavController) {
         actions = {
             // 현재 페이지가 MapPage일 때만 버튼을 표시
             if (currentRoute == "map") {
-                IconButton(onClick = {
-                    // 친구 추가 동작
-                }) {
+                IconButton(
+                    onClick = { navController.navigate("addFriends") }) {
                     Icon(
                         painter = painterResource(id = R.drawable.addfriend), // 친구 추가 아이콘
                         contentDescription = "Add Friend"

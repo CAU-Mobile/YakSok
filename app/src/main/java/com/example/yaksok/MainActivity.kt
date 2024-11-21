@@ -49,12 +49,14 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "yaksokDetail",
+                        startDestination = "login",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("map") {
-                            MapPage()
+                            MapPage(
+                                goToCreateYaksokPage = { navController.navigate("createYaksok") }
+                            )
                         }
                         composable("login") {
                             LoginPage(
@@ -74,7 +76,10 @@ class MainActivity : ComponentActivity() {
                             ManageYaksokPage(goToYaksokDetailPage = { navController.navigate("yaksokDetail") })
                         }
                         composable("createYaksok") {
-                            CreateYaksokPage()
+                            CreateYaksokPage(
+                                goToAddFriendToYaksokPage = { navController.navigate("addFriendToYaksok") },
+                                goToManageYaksokPage = { navController.navigate("manageYaksok") }
+                            )
                         }
                         composable("addFriendToYaksok") {
                             AddFriendToYaksokPage(friendList = friendList)
