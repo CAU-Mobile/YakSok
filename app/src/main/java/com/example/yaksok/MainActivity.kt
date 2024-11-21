@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "login",
+                        startDestination = "manageYaksok",
 
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("manageYaksok") {
-                            ManageYaksokPage()
+                            ManageYaksokPage(goToYaksokDetailPage = { navController.navigate("yaksokDetail") })
                         }
                         composable("createYaksok") {
                             CreateYaksokPage()
