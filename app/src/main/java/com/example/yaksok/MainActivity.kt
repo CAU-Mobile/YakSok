@@ -18,6 +18,7 @@ import com.example.yaksok.ui.friend.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
+import com.example.yaksok.ui.YaksokViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
@@ -38,6 +39,7 @@ class MainActivity : ComponentActivity() {
                 val loginViewModel = LoginViewModel()
                 val registerViewModel= RegisterViewModel()
                 val AddFriendViewModel= AddFriendViewModel()
+                val YaksokViewModel=YaksokViewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -53,7 +55,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(
                         navController = navController,
 
-                        startDestination = "addFriends",
+                        startDestination = "login",
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("map") {
@@ -78,7 +80,7 @@ class MainActivity : ComponentActivity() {
                             ManageYaksokPage()
                         }
                         composable("createYaksok") {
-                            CreateYaksokPage()
+                            CreateYaksokPage(viewModel = YaksokViewModel)
                         }
                         composable("addFriendToYaksok") {
                             AddFriendToYaksokPage(friendList = friendList)
