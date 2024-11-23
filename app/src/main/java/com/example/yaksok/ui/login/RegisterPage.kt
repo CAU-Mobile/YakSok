@@ -85,7 +85,7 @@ fun RegisterPage(
                     text = "Welcome!",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color(58,58,58)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -214,5 +214,12 @@ fun RegisterPage(
                 }
             }
         )
+    }
+
+    registerStatus?.let { isSuccess ->
+        if (isSuccess) {
+            showSuccessDialog = true
+            viewModel.clearRegisterState() // 상태 초기화
+        }
     }
 }

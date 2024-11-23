@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
 
 class RegisterViewModel : ViewModel() {
     private val _registerStatus = MutableStateFlow<Boolean?>(null) // 등록 상태
-    val registerStatus: StateFlow<Boolean?> = _registerStatus.asStateFlow()
+    val registerStatus: StateFlow<Boolean?> = _registerStatus
 
     private val _registerError = MutableStateFlow<String?>(null) // 오류 상태
-    val registerError: StateFlow<String?> = _registerError.asStateFlow()
+    val registerError: StateFlow<String?> = _registerError
 
 
     fun register(email: String, password: String, name: String, phoneNumber: String) {
@@ -42,7 +42,7 @@ class RegisterViewModel : ViewModel() {
 //        }
 //    }
 
-    fun clearRegisterState() { //상태초기화: 회원가입창에서 가입이 끝나고, 또다시 가입 페이지로 들어와야할때 대비
+    fun clearRegisterState() {
         _registerStatus.value = null
         _registerError.value = null
     }

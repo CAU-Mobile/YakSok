@@ -30,7 +30,7 @@ fun CommonBottomAppBar(navController: NavController) {
         { // 버튼을 가로로 배치하기 위해 Row 사용
             Button(
                 onClick = {
-                    // 버튼 클릭 시 실행할 동작
+                    navController.navigate("savedPlaces")
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
@@ -39,13 +39,13 @@ fun CommonBottomAppBar(navController: NavController) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.saved), // 버튼으로 사용할 이미지 리소스
-                    contentDescription = "savedImage", // 이미지 설명
+                    contentDescription = "savedPlacesBtn", // 이미지 설명
                     modifier = Modifier.size(25.dp) // 이미지 크기 설정
                 )
             }
             Button(
                 onClick = {
-                    // 버튼 클릭 시 실행할 동작
+                    navController.navigate("map")
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
@@ -54,13 +54,13 @@ fun CommonBottomAppBar(navController: NavController) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.home), // 버튼으로 사용할 이미지 리소스
-                    contentDescription = "savedImage", // 이미지 설명
+                    contentDescription = "homeBtn", // 이미지 설명
                     modifier = Modifier.size(25.dp) // 이미지 크기 설정
                 )
             }
             Button(
                 onClick = {
-                    // 버튼 클릭 시 실행할 동작
+                    navController.navigate("manageYaksok")
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
@@ -69,7 +69,7 @@ fun CommonBottomAppBar(navController: NavController) {
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.list), // 버튼으로 사용할 이미지 리소스
-                    contentDescription = "savedImage", // 이미지 설명
+                    contentDescription = "manageYaksokBtn", // 이미지 설명
                     modifier = Modifier.size(25.dp) // 이미지 크기 설정
                 )
             }

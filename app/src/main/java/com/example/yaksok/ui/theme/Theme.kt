@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -51,7 +52,9 @@ fun YakSokTheme(
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = MaterialTheme.colorScheme.copy(
+            onBackground = Color(58,58,58) // 텍스트 기본 색상을 연한 검정으로 설정
+        ),
         typography = CustomTypography, // Custom typography 적용
         content = content
     )

@@ -1,6 +1,7 @@
 package com.example.yaksok.query
 
 import android.annotation.SuppressLint
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
@@ -10,6 +11,7 @@ data class User(
     val name: String = "",
     val phoneNumber: String = ""
 )
+
 
 class UsersQuery {
     companion object {
@@ -69,6 +71,7 @@ class UsersQuery {
                     callBack(false, null, it.toString())
                 }
         }
+
         fun checkUserExists(
             userId: String,
             callBack: (Boolean) -> Unit

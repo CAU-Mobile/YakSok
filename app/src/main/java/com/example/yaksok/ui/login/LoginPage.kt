@@ -39,16 +39,18 @@ import com.example.yaksok.query.AuthQuery
 @Composable
 fun LoginPage(
     goToRegisterPage: () -> Unit,
+    goToMapPage: () -> Unit,
     viewModel: LoginViewModel,
     onLoginSuccess: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loginMessage by remember { mutableStateOf("") }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
 
-    if (isLoggedIn) {
+    if (isLoggedIn == true) {
         onLoginSuccess()
     }
 
@@ -79,7 +81,7 @@ fun LoginPage(
                     text = "약속어때",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black // 색상은 이미지 참고하여 설정
+                    color = Color(58,58,58) // 색상은 이미지 참고하여 설정
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -164,6 +166,31 @@ fun LoginPage(
                     )
                 }
             }
+        }
+    }
+
+    //로그인 확인 메세지 추가~
+    if (showSuccessDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("로그인 완료") },
+            text = { Text("로그인 되었습니다.") },
+            confirmButton = {
+                Button(onClick = {
+                    showSuccessDialog = false
+                    // 로그인 성공 후 맵으로 이동
+                    goToMapPage()
+                }) {
+                    Text("확인")
+                }
+            }
+        )
+    }
+
+    isLoggedIn?.let { isSuccess ->
+        if (isSuccess) {
+            showSuccessDialog = true
+            viewModel.clearLoginState() // 상태 초기화
         }
     }
 }

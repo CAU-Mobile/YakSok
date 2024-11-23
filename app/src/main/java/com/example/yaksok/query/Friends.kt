@@ -5,6 +5,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 data class Friends(
     val friendIds: List<String> = emptyList()
@@ -52,6 +53,19 @@ class FriendsQuery {
                 .addOnFailureListener {
                     continuation.resume(Result.failure(it))
                 }
+        }
+
+        suspend fun getFriendslist(userId: String): List<String> {
+            return suspendCancellableCoroutine { continuation ->
+                friendsCollection.document(userId).get()
+                    .addOnSuccessListener {
+                        val friendsList = it.toObject<Friends>()?.friendIds ?: emptyList()
+                        continuation.resume(friendsList)
+                    }
+                    .addOnFailureListener {
+                        continuation.resumeWithException(it) // 실패 시 예외를 던짐
+                    }
+            }
         }
 
         fun deleteUser(

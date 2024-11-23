@@ -1,5 +1,6 @@
 package com.example.yaksok.ui.friend
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,13 +43,14 @@ fun AddFriendsPage (
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color.White)
             .padding(16.dp)
     ) {
         Text(
             text = "친구 추가",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = Color(58,58,58)
         )
         Spacer(modifier = Modifier.height(16.dp))
         TextField(

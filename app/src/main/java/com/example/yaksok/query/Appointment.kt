@@ -26,7 +26,7 @@ class AppointmentQuery {
             geoPoint: GeoPoint,
             time: Timestamp,
             memberIds: List<String>,
-            callBack: (Boolean, String?, String?) -> Unit
+            callBack: (Boolean,String?, String?) -> Unit
         ) {
             appointmentsCollection.add(Appointment(name, details, geoPoint, time, memberIds))
                 .addOnSuccessListener {

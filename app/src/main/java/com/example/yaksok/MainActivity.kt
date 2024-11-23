@@ -13,11 +13,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.ui.friend.AddFriendToYaksokPage
 import com.example.yaksok.ui.friend.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
+import com.example.yaksok.ui.SavedPlacesPage
+import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.YaksokViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
@@ -35,11 +38,12 @@ class MainActivity : ComponentActivity() {
             YakSokTheme {
                 val navController = rememberNavController()
                 val friendList = listOf("박수빈", "박예빈", "임결", "최지원", "이준우",
-                    "박수빈", "박예빈", "임결", "최지원", "이준우")
+                    "박수빈", "박예빈", "임결", "최지원", "이준우") //친구리스트 테스트용
                 val loginViewModel = LoginViewModel()
                 val registerViewModel= RegisterViewModel()
                 val AddFriendViewModel= AddFriendViewModel()
                 val YaksokViewModel=YaksokViewModel()
+                val userId=AuthQuery.getCurrentUserId()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -67,7 +71,8 @@ class MainActivity : ComponentActivity() {
                             LoginPage(
                                 goToRegisterPage = { navController.navigate("register") },
                                 viewModel = loginViewModel,
-                                onLoginSuccess = { navController.navigate("map") }//로그인 성공시 이동
+                                onLoginSuccess = { navController.navigate("map") },//로그인 성공시 이동
+                                goToMapPage = { navController.navigate("map") }
                             )
                         }
                         composable("register") {
@@ -77,18 +82,33 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("manageYaksok") {
-                            ManageYaksokPage()
+                            ManageYaksokPage(goToYaksokDetailPage = { navController.navigate("yaksokDetail") })
                         }
                         composable("createYaksok") {
-                            CreateYaksokPage(viewModel = YaksokViewModel)
+                            CreateYaksokPage(
+                                goToAddFriendToYaksokPage ={navController.navigate("addFriendToYaksok")},
+                                viewModel = YaksokViewModel,
+                                selectedFriends =  AddFriendViewModel.selectedFriends
+                            )
                         }
                         composable("addFriendToYaksok") {
-                            AddFriendToYaksokPage(friendList = friendList)
+                            if (userId != null) {
+                                AddFriendToYaksokPage(
+                                    userId=userId,
+                                    viewModel = AddFriendViewModel
+                                )
+                            }
                         }
                         composable("addFriends") {
                             AddFriendsPage(
                                 viewModel = AddFriendViewModel
                             )
+                        }
+                        composable("yaksokDetail") {
+                            YaksokDetailPage()
+                        }
+                        composable("savedPlaces") {
+                            SavedPlacesPage()
                         }
                     }
                 }
