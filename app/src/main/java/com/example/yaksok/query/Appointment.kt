@@ -54,7 +54,7 @@ class AppointmentQuery {
             memberId: String,
             callBack: (Boolean, Map<String, Appointment>?, String?) -> Unit
         ) {
-            appointmentsCollection.whereArrayContains("userIds", memberId).get()
+            appointmentsCollection.whereArrayContains("memberIds", memberId).get()
                 .addOnSuccessListener { appointments ->
                     if (appointments.size() == 0) {
                         callBack(false, null, "No Appointments!")

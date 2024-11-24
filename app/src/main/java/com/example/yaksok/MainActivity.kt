@@ -82,7 +82,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("manageYaksok") {
-                            ManageYaksokPage(goToYaksokDetailPage = { navController.navigate("yaksokDetail") })
+                            ManageYaksokPage(
+                                goToYaksokDetailPage = { navController.navigate("yaksokDetail") },
+                                viewModel = YaksokViewModel
+                            )
                         }
                         composable("createYaksok") {
                             CreateYaksokPage(

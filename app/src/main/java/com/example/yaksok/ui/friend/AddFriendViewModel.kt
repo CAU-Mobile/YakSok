@@ -90,7 +90,7 @@ class AddFriendViewModel : ViewModel() {
     }
 
     //친구 약속에 추가 항목. 약속에서 친구추가 -> 친구로드
-
+    //지금 생각해보니 괜히 이 함수 써서 친구목록 로딩 늘린거같음 걍 위에서 FriendList 에 추가할걸
     fun loadFriends(userId: String) {
         _loading.value = true
         _error.value = null

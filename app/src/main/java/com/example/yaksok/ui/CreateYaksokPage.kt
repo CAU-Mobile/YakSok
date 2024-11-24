@@ -210,8 +210,7 @@ fun CreateYaksokPage(
                 )
             )
             Button(
-                onClick = { showCalender = true
-                    goToAddFriendToYaksokPage()},
+                onClick = { showCalender = true },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 border = BorderStroke(2.dp, Color.Gray),
