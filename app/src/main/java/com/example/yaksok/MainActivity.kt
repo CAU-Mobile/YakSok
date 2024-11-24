@@ -88,6 +88,7 @@ class MainActivity : ComponentActivity() {
                             CreateYaksokPage(
                                 goToAddFriendToYaksokPage ={navController.navigate("addFriendToYaksok")},
                                 viewModel = YaksokViewModel,
+                                goToManageYaksokPage = { navController.navigate("manageYaksok") },
                                 selectedFriends =  AddFriendViewModel.selectedFriends
                             )
                         }

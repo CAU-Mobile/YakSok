@@ -29,6 +29,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -50,8 +54,10 @@ import java.util.Calendar
 fun CreateYaksokPage(
     viewModel: YaksokViewModel,
     goToAddFriendToYaksokPage: () -> Unit,
-    selectedFriends: StateFlow<List<User>>
+    selectedFriends: StateFlow<List<User>>,
+    goToManageYaksokPage: () -> Unit
 ) {
+    var showSuccessDialog by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
     var details by remember { mutableStateOf(" ") }
     var geoPoint by remember { mutableStateOf("") }
@@ -204,7 +210,8 @@ fun CreateYaksokPage(
                 )
             )
             Button(
-                onClick = { showCalender = true },
+                onClick = { showCalender = true
+                    goToAddFriendToYaksokPage()},
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 border = BorderStroke(2.dp, Color.Gray),
@@ -215,6 +222,7 @@ fun CreateYaksokPage(
             // '약속 만들기' 버튼을 화면 하단에 배치
             Button(
                 onClick = {
+                    showSuccessDialog = true
                     timestamp?.let {
                         viewModel.addYaksok(
                             name,
@@ -237,5 +245,24 @@ fun CreateYaksokPage(
     if (showCalender) {
         showDateTimePickerDialog()
         showCalender=false
+    }
+
+    if(showSuccessDialog){
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showSuccessDialog = false },
+            title = { Text("약속 만들기") },
+            text = { Text("약속이 성공적으로 만들어졌습니다.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSuccessDialog = false
+                        goToManageYaksokPage()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
+                ) {
+                    Text("확인")
+                }
+            }
+        )
     }
 }
