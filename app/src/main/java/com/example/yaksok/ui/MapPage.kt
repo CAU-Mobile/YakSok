@@ -58,9 +58,7 @@ fun MapPage(
 
         // Floating Action Button (FAB)
         FloatingActionButton(
-            onClick = {
-                goToCreateYaksokPage()
-            },
+            onClick = goToCreateYaksokPage,
             containerColor = Color.Gray, // FAB 배경색
             contentColor = Color.White, // 아이콘 색상
             modifier = Modifier
@@ -75,3 +73,9 @@ fun MapPage(
     }
 }
 
+
+@Preview
+@Composable
+fun MapPagePreview() {
+    MapPage({})
+}

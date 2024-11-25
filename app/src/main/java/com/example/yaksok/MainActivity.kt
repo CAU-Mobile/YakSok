@@ -13,17 +13,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.yaksok.ui.AddFriendToYaksokPage
-import com.example.yaksok.ui.AddFriendsPage
+import com.example.yaksok.query.AuthQuery
+import com.example.yaksok.ui.friend.AddFriendToYaksokPage
+import com.example.yaksok.ui.friend.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
-import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
 import com.example.yaksok.ui.SavedPlacesPage
 import com.example.yaksok.ui.YaksokDetailPage
+import com.example.yaksok.ui.YaksokViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
+import com.example.yaksok.ui.friend.AddFriendViewModel
 import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
@@ -36,21 +38,28 @@ class MainActivity : ComponentActivity() {
             YakSokTheme {
                 val navController = rememberNavController()
                 val friendList = listOf("박수빈", "박예빈", "임결", "최지원", "이준우",
-                    "박수빈", "박예빈", "임결", "최지원", "이준우")
+                    "박수빈", "박예빈", "임결", "최지원", "이준우") //친구리스트 테스트용
                 val loginViewModel = LoginViewModel()
                 val registerViewModel= RegisterViewModel()
+                val AddFriendViewModel= AddFriendViewModel()
+                val YaksokViewModel=YaksokViewModel()
+                val userId=AuthQuery.getCurrentUserId()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.Transparent, // Scaffold 배경색 투명 설정
                     bottomBar = { CommonBottomAppBar(navController) },
-                    topBar = { CommonTopAppBar(navController) }
+                    topBar = {
+                        CommonTopAppBar(
+                            navController = navController,
+                            goToAddFriendsPage = { navController.navigate("addFriends") }
+                        )
+                    }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
 
                         startDestination = "login",
-
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("map") {
@@ -73,19 +82,31 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("manageYaksok") {
-                            ManageYaksokPage(goToYaksokDetailPage = { navController.navigate("yaksokDetail") })
+                            ManageYaksokPage(
+                                goToYaksokDetailPage = { navController.navigate("yaksokDetail") },
+                                viewModel = YaksokViewModel
+                            )
                         }
                         composable("createYaksok") {
                             CreateYaksokPage(
-                                goToAddFriendToYaksokPage = { navController.navigate("addFriendToYaksok") },
-                                goToManageYaksokPage = { navController.navigate("manageYaksok") }
+                                goToAddFriendToYaksokPage ={navController.navigate("addFriendToYaksok")},
+                                viewModel = YaksokViewModel,
+                                goToManageYaksokPage = { navController.navigate("manageYaksok") },
+                                selectedFriends =  AddFriendViewModel.selectedFriends
                             )
                         }
                         composable("addFriendToYaksok") {
-                            AddFriendToYaksokPage(friendList = friendList)
+                            if (userId != null) {
+                                AddFriendToYaksokPage(
+                                    userId=userId,
+                                    viewModel = AddFriendViewModel
+                                )
+                            }
                         }
                         composable("addFriends") {
-                            AddFriendsPage()
+                            AddFriendsPage(
+                                viewModel = AddFriendViewModel
+                            )
                         }
                         composable("yaksokDetail") {
                             YaksokDetailPage()

@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,11 +39,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun ManageYaksokPage(
-    goToYaksokDetailPage: () -> Unit
+    goToYaksokDetailPage: () -> Unit,
+    viewModel: YaksokViewModel
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.loadYaksokList()
+    }
+
+    val yaksokList by viewModel.YaksokList.collectAsState(emptyList())
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -51,95 +64,158 @@ fun ManageYaksokPage(
             fontWeight = FontWeight.Bold,
             color = Color(58,58,58)
         )
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(16.dp))
                 .padding(16.dp)
                 .background(Color(230, 230, 230))
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
-
-            ) {
-                repeat(5) { // 반복적으로 약속 Column 생성
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(20.dp)) // Column 모서리를 둥글게 설정
-                            .background(Color(185, 229, 232)) // 배경색
-                            .border(2.dp, Color.Gray, RoundedCornerShape(20.dp)) // 둥근 테두리
-                            .padding(24.dp) // 내부 여백
-                            .clickable { goToYaksokDetailPage() } // 클릭 가능하도록 설정, 'ripple' 효과 자동적용
+        ){
+            items(yaksokList){ appointment ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(20.dp)) // Column 모서리를 둥글게 설정
+                        .background(Color(185, 229, 232)) // 배경색
+                        .border(2.dp, Color.Gray, RoundedCornerShape(20.dp)) // 둥근 테두리
+                        .padding(24.dp) // 내부 여백
+                        .clickable { goToYaksokDetailPage() } // 클릭 가능하도록 설정, 'ripple' 효과 자동적용
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "학생회 모임",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Light,
-                                color = Color(58, 58, 58)
-                            )
-                            Spacer(modifier = Modifier.width(40.dp))
-                            Text(
-                                text = "2024-12-25",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Light,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "13:00",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Light,
-                                color = Color.Gray
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Divider(
-                            color = Color.LightGray,      // 선 색상
-                            thickness = 1.dp,        // 선 두께
+                        Text(
+                            text = appointment.name,  // 약속 이름
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Light,
+                            color = Color(58, 58, 58)
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "장소 : 중앙대학교 310관 728호",
-                                fontSize = 15.sp,
-                                color = Color.Black
-                            )
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "참여자 : 박수빈, 박예빈, 임결, 최지원",
-                                fontSize = 15.sp,
-                                color = Color.Black
-                            )
-                        }
+
+                        Spacer(modifier = Modifier.width(40.dp))
+                        Text(
+                            text = appointment.time.toString(),  // 약속 이름
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Light,
+                            color = Color(58, 58, 58)
+                        )
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Divider(
+                        color = Color.LightGray,      // 선 색상
+                        thickness = 1.dp,        // 선 두께
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "장소 : ${appointment.geoPoint}",  // 장소
+                            fontSize = 15.sp,
+                            color = Color.Black
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "참여자 : ${appointment.memberIds.joinToString(", ")}", // 참여자
+                            fontSize = 15.sp,
+                            color = Color.Black
+                        )
+                    }
                 }
+                Spacer(modifier = Modifier.height(16.dp)) // 각 항목 사이에 여백 추가
             }
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .fillMaxHeight()
+//                .clip(RoundedCornerShape(16.dp))
+//                .padding(16.dp)
+//                .background(Color(230, 230, 230))
+//        ) {
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .fillMaxHeight()
+//                    .padding(16.dp)
+//                    .verticalScroll(rememberScrollState())
+//
+//            ) {
+//                repeat(5) { // 반복적으로 약속 Column 생성
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .clip(RoundedCornerShape(20.dp)) // Column 모서리를 둥글게 설정
+//                            .background(Color(185, 229, 232)) // 배경색
+//                            .border(2.dp, Color.Gray, RoundedCornerShape(20.dp)) // 둥근 테두리
+//                            .padding(24.dp) // 내부 여백
+//                            .clickable { goToYaksokDetailPage() } // 클릭 가능하도록 설정, 'ripple' 효과 자동적용
+//                    ) {
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text(
+//                                text = ,
+//                                fontSize = 20.sp,
+//                                fontWeight = FontWeight.Light,
+//                                color = Color(58, 58, 58)
+//                            )
+//                            Spacer(modifier = Modifier.width(40.dp))
+//                            Text(
+//                                text = "2024-12-25",
+//                                fontSize = 15.sp,
+//                                fontWeight = FontWeight.Light,
+//                                color = Color.Gray
+//                            )
+//                            Text(
+//                                text = "13:00",
+//                                fontSize = 15.sp,
+//                                fontWeight = FontWeight.Light,
+//                                color = Color.Gray
+//                            )
+//                        }
+//                        Spacer(modifier = Modifier.height(8.dp))
+//                        Divider(
+//                            color = Color.LightGray,      // 선 색상
+//                            thickness = 1.dp,        // 선 두께
+//                        )
+//                        Spacer(modifier = Modifier.height(8.dp))
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text(
+//                                text = "장소 : 중앙대학교 310관 728호",
+//                                fontSize = 15.sp,
+//                                color = Color.Black
+//                            )
+//                        }
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text(
+//                                text = "참여자 : 박수빈, 박예빈, 임결, 최지원",
+//                                fontSize = 15.sp,
+//                                color = Color.Black
+//                            )
+//                        }
+//                    }
+//                    Spacer(modifier = Modifier.height(16.dp))
+//                }
+//            }
         }
     }
-}
-
-@Preview
-@Composable
-fun ManageYaksokPagePreview() {
-    ManageYaksokPage(goToYaksokDetailPage = {})
 }

@@ -8,6 +8,7 @@ import com.google.firebase.firestore.toObject
 
 data class Appointment(
     val name: String = "",
+    val details: String="",
     val geoPoint: GeoPoint = GeoPoint(0.0, 0.0),
     val time: Timestamp = Timestamp.now(),
     val memberIds: List<String> = emptyList()
@@ -21,12 +22,13 @@ class AppointmentQuery {
 
         fun createAppointment(
             name: String,
+            details: String,
             geoPoint: GeoPoint,
             time: Timestamp,
             memberIds: List<String>,
-            callBack: (Boolean, String?, String?) -> Unit
+            callBack: (Boolean,String?, String?) -> Unit
         ) {
-            appointmentsCollection.add(Appointment(name, geoPoint, time, memberIds))
+            appointmentsCollection.add(Appointment(name, details, geoPoint, time, memberIds))
                 .addOnSuccessListener {
                     callBack(true, it.id, "Create Success!")
                 }
@@ -52,7 +54,7 @@ class AppointmentQuery {
             memberId: String,
             callBack: (Boolean, Map<String, Appointment>?, String?) -> Unit
         ) {
-            appointmentsCollection.whereArrayContains("userIds", memberId).get()
+            appointmentsCollection.whereArrayContains("memberIds", memberId).get()
                 .addOnSuccessListener { appointments ->
                     if (appointments.size() == 0) {
                         callBack(false, null, "No Appointments!")

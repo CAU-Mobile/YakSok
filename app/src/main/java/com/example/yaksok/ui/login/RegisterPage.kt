@@ -52,6 +52,12 @@ fun RegisterPage(
 
     val registerStatus by viewModel.registerStatus.collectAsState()
     val registerError by viewModel.registerError.collectAsState()
+
+    if (registerStatus == true) {
+        showSuccessDialog = true
+    }
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->

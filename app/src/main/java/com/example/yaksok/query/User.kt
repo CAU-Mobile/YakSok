@@ -1,8 +1,11 @@
 package com.example.yaksok.query
 
 import android.annotation.SuppressLint
+import android.util.Log
+import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
+import kotlinx.coroutines.tasks.await
 
 data class User(
     val userCode: String = "",
@@ -10,18 +13,18 @@ data class User(
     val phoneNumber: String = ""
 )
 
+
 class UsersQuery {
     companion object {
         @SuppressLint("StaticFieldLeak")
         private val db = FirebaseFirestore.getInstance()
         private val usersCollection = db.collection("users")
 
-        fun createUser(
+        suspend fun createUser(
             userId: String,
             name: String? = null,
-            phoneNumber: String? = null,
-            callBack: (Boolean, String?, String?) -> Unit
-        ) {
+            phoneNumber: String? = null
+        ): Result<String> {
             val userCode = createCode()
             val newUser = User(
                 userCode = userCode,
@@ -29,12 +32,17 @@ class UsersQuery {
                 phoneNumber = phoneNumber ?: ""
             )
 
-            usersCollection.document(userId).set(newUser)
-                .addOnSuccessListener {
-                    callBack(true, userCode, "Create Success!")
-                }.addOnFailureListener {
-                    callBack(false, null, it.toString())
-                }
+            return try {
+                FirebaseFirestore.getInstance().collection("users").document(userId)
+                    .set(newUser)
+                    .await() //이걸 적용해줘야 하는건가;;;;;
+
+                // 성공적으로 저장된 경우
+                Result.success("Create Success! User Code: $userCode")
+            } catch (e: Exception) {
+                // 실패한 경우
+                Result.failure(Exception("Failed to create user: ${e.message}"))
+            }
         }
 
         fun getUser(
@@ -46,6 +54,25 @@ class UsersQuery {
                     callBack(true, it.toObject<User>(), "Get Success!")
                 }.addOnFailureListener {
                     callBack(false, null, it.toString())
+                }
+        }
+
+        fun getUserCodeWithId(
+            userId: String,
+            callBack: (Boolean, String?, String?) -> Unit
+        ) {
+            usersCollection.document(userId).get()
+                .addOnSuccessListener { documents ->
+                    if (documents.exists()) {
+                        val userCode = documents.getString("userCode")
+                        Log.d("UsersQuery", "Found userCode: $userCode")
+                        callBack(true, userCode, "Get Success!")
+                    } else {
+                        callBack(false, null, "No User Found!")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    callBack(false, null, exception.toString())
                 }
         }
 
@@ -64,6 +91,7 @@ class UsersQuery {
                     callBack(false, null, it.toString())
                 }
         }
+
         fun checkUserExists(
             userId: String,
             callBack: (Boolean) -> Unit
