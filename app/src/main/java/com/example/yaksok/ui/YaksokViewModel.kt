@@ -5,15 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQuery
+import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
+import com.example.yaksok.query.UsersQueryCoroutine
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class YaksokViewModel : ViewModel(){
 
@@ -76,27 +82,64 @@ class YaksokViewModel : ViewModel(){
             }
         }
     }
-
     fun loadYaksokList() {
-        viewModelScope.launch {
+        viewModelScope.launch{
             AuthQuery.getCurrentUserId()?.let { currentUserId ->
-                UsersQuery.getUserCodeWithId(currentUserId) { success, currentUserCode, errorMessage ->
+                val currentUserCode= UsersQueryCoroutine.getUserCodeWithId(currentUserId)
                     if (currentUserCode != null) {
-                        AppointmentQuery.getAppointmentsWithUserId(currentUserCode) { success, appointments, errorMessage ->
-                            if (success && appointments != null) {
-                                val appointmentList = appointments.values.toList()
-                                _YaksokList.value = appointmentList
-                                Log.d("loadYaksok", "AppointmentId:${appointments.size}")
+                        try {
+                            val appointments = AppointmentQueryCoroutine.getAppointmentsWithUserId(currentUserCode)
+                            if (appointments != null) {
+                                val updatedAppointments = appointments.values.map { appointment ->
+                                    val memberNames = appointment.memberIds.map { memberId ->
+                                        async {
+                                            UsersQueryCoroutine.getUserWithCode(memberId)?.name
+                                        }
+                                    }.awaitAll().filterNotNull()
+                                    appointment.copy(memberIds = memberNames)
+                                }
+
+                                // 결과 업데이트
+                                _YaksokList.value = updatedAppointments
                             } else {
                                 _YaksokList.value = emptyList()
-                                _isYaksokError.value = errorMessage ?: "Failed to load appointments"
+                                _isYaksokError.value = "Failed to load appointments"
                             }
+                        } catch (e: Exception) {
+                            _isYaksokError.value = e.message ?: "An error occurred"
                         }
                     }
-                }
             }
         }
     }
+
+//    fun loadYaksokList() {
+//        viewModelScope.launch {
+//            AuthQuery.getCurrentUserId()?.let { currentUserId ->
+//                UsersQuery.getUserCodeWithId(currentUserId) { success, currentUserCode, errorMessage ->
+//                    if (currentUserCode != null) {
+//                        val appointments = AppointmentQueryCoroutine.getAppointmentsWithUserId(currentUserCode)
+//                            if (appointments != null) {
+//                                val updatedAppointments = appointments.values.map{ appointment ->
+//                                    val memberNames = appointment.memberIds.map { memberId ->
+//                                        async {
+//                                            if (memberId != null) {
+//                                                UsersQueryCoroutine.getUserWithCode(memberId)?.name
+//                                            }
+//                                        }
+//                                    }.awaitAll().filterNotNull()
+//                                    appointment.copy(memberIds = memberNames)
+//                                }
+//                                _YaksokList.value = updatedAppointments
+//                            }  else {
+//                                _YaksokList.value = emptyList()
+//                                _isYaksokError.value = errorMessage ?: "Failed to load appointments"
+//                            }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 //    fun addYaksok(
 //        name: String,
