@@ -47,6 +47,7 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.type.Date
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Calendar
+import java.util.TimeZone
 
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +67,7 @@ fun CreateYaksokPage(
     val context = LocalContext.current
     var showCalender by remember { mutableStateOf(false) }
 
-    val calendar = Calendar.getInstance()
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
     var selectedDate by remember { mutableStateOf(calendar.timeInMillis) }
     var selectedHour by remember { mutableStateOf(calendar.get(Calendar.HOUR_OF_DAY)) }
     var selectedMinute by remember { mutableStateOf(calendar.get(Calendar.MINUTE)) }

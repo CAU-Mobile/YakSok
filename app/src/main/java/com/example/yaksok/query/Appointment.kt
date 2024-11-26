@@ -5,6 +5,9 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.toObject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 data class Appointment(
     val name: String = "",
@@ -26,7 +29,7 @@ class AppointmentQuery {
             geoPoint: GeoPoint,
             time: Timestamp,
             memberIds: List<String>,
-            callBack: (Boolean,String?, String?) -> Unit
+            callBack: (Boolean, String?, String?) -> Unit
         ) {
             appointmentsCollection.add(Appointment(name, details, geoPoint, time, memberIds))
                 .addOnSuccessListener {
@@ -178,6 +181,132 @@ class AppointmentQuery {
                 .addOnFailureListener {
                     callBack(false, it.toString())
                 }
+        }
+    }
+}
+
+class AppointmentQueryCoroutine {
+    companion object {
+        suspend fun createAppointment(
+            name: String,
+            details: String,
+            geoPoint: GeoPoint,
+            time: Timestamp,
+            memberIds: List<String>
+        ): String? {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.createAppointment(
+                    name, details, geoPoint, time, memberIds
+                ) { isSuccess, appointmentId, log ->
+                        if (isSuccess) {
+                            continuation.resume(appointmentId)
+                        } else {
+                            continuation.resumeWithException(Exception(log))
+                        }
+                }
+            }
+        }
+
+        suspend fun getAppointment(
+            appointmentId: String
+        ): Appointment? {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.getAppointment(
+                    appointmentId
+                ) { isSuccess, appointment, log ->
+                        if (isSuccess) {
+                            continuation.resume(appointment)
+                        } else {
+                            continuation.resumeWithException(Exception(log))
+                        }
+                }
+            }
+        }
+
+        suspend fun getAppointmentsWithUserId(
+            memberId: String
+        ): Map<String, Appointment>? {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.getAppointmentsWithUserId(
+                    memberId
+                ) { isSuccess, resultMap, log ->
+                        if (isSuccess) {
+                            continuation.resume(resultMap)
+                        } else {
+                            continuation.resumeWithException(Exception(log))
+                        }
+                }
+            }
+        }
+
+        suspend fun deleteAppointment(
+            appointmentId: String
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.deleteAppointment(
+                    appointmentId
+                ) { isSuccess, log ->
+                        if (isSuccess) {
+                            continuation.resume(Unit)
+                        } else {
+                            continuation.resumeWithException(Exception(log))
+                        }
+                }
+            }
+        }
+
+        suspend fun updateAppointment(
+            appointmentId: String,
+            name: String? = null,
+            geoPoint: GeoPoint? = null,
+            time: Timestamp? = null,
+            memberIds: List<String>? = null
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.updateAppointment(
+                    appointmentId, name, geoPoint, time, memberIds
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun addAppointmentMember(
+            appointmentId: String,
+            memberId: String
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.addAppointmentMember(
+                    appointmentId, memberId
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun deleteAppointmentMember(
+            appointmentId: String,
+            memberId: String
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                AppointmentQuery.deleteAppointmentMember(
+                    appointmentId, memberId
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
         }
     }
 }

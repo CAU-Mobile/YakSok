@@ -63,7 +63,7 @@ class AuthQuery {
             return try {
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
                 val userId = auth.currentUser?.uid ?: return Result.failure(Exception("Failed to get User ID"))
-                createUser(userId, name, phoneNumber)
+                UsersQueryCoroutine.createUser(userId, name, phoneNumber)
                 Result.success("회원가입 성공!")
             } catch (e: FirebaseAuthUserCollisionException) {
                 Result.failure(Exception("이미 가입된 이메일입니다."))
