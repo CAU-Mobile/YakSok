@@ -40,6 +40,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun ManageYaksokPage(
@@ -96,7 +98,10 @@ fun ManageYaksokPage(
 
                         Spacer(modifier = Modifier.width(40.dp))
                         Text(
-                            text = appointment.time.toString(),  // 약속 이름
+                            text = DateTimeFormatter
+                                .ofPattern("yyyy년 MM월 dd일\r\nHH시 mm분")
+                                .withZone(ZoneId.of("Asia/Seoul"))
+                                .format(appointment.time.toDate().toInstant()),  // 약속 시간
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Light,
                             color = Color(58, 58, 58)
