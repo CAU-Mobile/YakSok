@@ -6,6 +6,9 @@ import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 data class User(
     val userCode: String = "",
@@ -13,36 +16,30 @@ data class User(
     val phoneNumber: String = ""
 )
 
-
 class UsersQuery {
     companion object {
         @SuppressLint("StaticFieldLeak")
         private val db = FirebaseFirestore.getInstance()
         private val usersCollection = db.collection("users")
 
-        suspend fun createUser(
+        fun createUser(
             userId: String,
             name: String? = null,
-            phoneNumber: String? = null
-        ): Result<String> {
+            phoneNumber: String? = null,
+            callBack: (Boolean, String?, String?) -> Unit
+        ) {
             val userCode = createCode()
             val newUser = User(
                 userCode = userCode,
                 name = name ?: "",
                 phoneNumber = phoneNumber ?: ""
             )
-
-            return try {
-                FirebaseFirestore.getInstance().collection("users").document(userId)
-                    .set(newUser)
-                    .await() //이걸 적용해줘야 하는건가;;;;;
-
-                // 성공적으로 저장된 경우
-                Result.success("Create Success! User Code: $userCode")
-            } catch (e: Exception) {
-                // 실패한 경우
-                Result.failure(Exception("Failed to create user: ${e.message}"))
-            }
+            usersCollection.document(userId).set(newUser)
+                .addOnSuccessListener {
+                    callBack(true, userCode, "Create Success!")
+                }.addOnFailureListener {
+                    callBack(false, null, it.toString())
+                }
         }
 
         fun getUser(
@@ -191,6 +188,154 @@ class UsersQuery {
                 .joinToString("")
 
             return "$timePart1-$timePart2-$randomPart"
+        }
+    }
+}
+
+class UsersQueryCoroutine {
+    companion object {
+        suspend fun createUser(
+            userId: String,
+            name: String? = null,
+            phoneNumber: String? = null
+        ): String? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.createUser(
+                    userId, name, phoneNumber
+                ) { isSuccess, userCode, log ->
+                    if (isSuccess) {
+                        continuation.resume(userCode)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun getUser(
+            userId: String
+        ): User? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.getUser(
+                    userId
+                ) { isSuccess, user, log ->
+                    if (isSuccess) {
+                        continuation.resume(user)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun getUserCodeWithId(
+            userId: String
+        ): String? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.getUserCodeWithId(
+                    userId
+                ) { isSuccess, userCode, log ->
+                    if (isSuccess) {
+                        continuation.resume(userCode)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun getUserIdWithCode(
+            userCode: String
+        ): String? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.getUserIdWithCode(
+                    userCode
+                ) { isSuccess, userId, log ->
+                    if (isSuccess) {
+                        continuation.resume(userId)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun getUserWithCode(
+            userCode: String
+        ): User? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.getUserWithCode(
+                    userCode
+                ) { isSuccess, user, log ->
+                    if (isSuccess) {
+                        continuation.resume(user)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun getUserNameWithCode(
+            userCode: String
+        ): String? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.getUserNameWithCode(
+                    userCode
+                ) { isSuccess, userName, log ->
+                    if (isSuccess) {
+                        continuation.resume(userName)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun checkUserExists(
+            userId: String
+        ): Boolean? {
+            return suspendCoroutine { continuation ->
+                UsersQuery.checkUserExists(
+                    userId
+                ) { isExists ->
+                    continuation.resume(isExists)
+                }
+            }
+        }
+
+        suspend fun updateUser(
+            userId: String,
+            name: String? = null,
+            phoneNumber: String? = null
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                UsersQuery.updateUser(
+                    userId, name, phoneNumber
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun deleteUser(
+            userId: String
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                UsersQuery.deleteUser(
+                    userId
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
         }
     }
 }

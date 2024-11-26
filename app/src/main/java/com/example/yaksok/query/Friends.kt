@@ -6,6 +6,7 @@ import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 data class Friends(
     val friendIds: List<String> = emptyList()
@@ -29,43 +30,19 @@ class FriendsQuery {
                     callBack(false, it.toString())
                 }
         }
-//        코루틴 적용 전
-//        fun getFriends(
-//            userId: String,
-//            callBack: (Boolean, List<String>?, String?) -> Unit
-//        ) {
-//            friendsCollection.document(userId).get()
-//                .addOnSuccessListener {
-//                    val friendsList = it.toObject<Friends>()?.friendIds
-//                    callBack(true, friendsList, "Get Success!")
-//                }
-//                .addOnFailureListener {
-//                    callBack(false, null, it.toString())
-//                }
-//        }
 
-        suspend fun getFriends(userId: String): Result<List<String>> = suspendCancellableCoroutine { continuation ->
+        fun getFriends(
+            userId: String,
+            callBack: (Boolean, List<String>?, String?) -> Unit
+        ) {
             friendsCollection.document(userId).get()
                 .addOnSuccessListener {
-                    val friendsList = it.toObject<Friends>()?.friendIds ?: emptyList()
-                    continuation.resume(Result.success(friendsList))
+                    val friendsList = it.toObject<Friends>()?.friendIds
+                    callBack(true, friendsList, "Get Success!")
                 }
                 .addOnFailureListener {
-                    continuation.resume(Result.failure(it))
+                    callBack(false, null, it.toString())
                 }
-        }
-
-        suspend fun getFriendslist(userId: String): List<String> {
-            return suspendCancellableCoroutine { continuation ->
-                friendsCollection.document(userId).get()
-                    .addOnSuccessListener {
-                        val friendsList = it.toObject<Friends>()?.friendIds ?: emptyList()
-                        continuation.resume(friendsList)
-                    }
-                    .addOnFailureListener {
-                        continuation.resumeWithException(it) // 실패 시 예외를 던짐
-                    }
-            }
         }
 
         fun deleteUser(
@@ -144,5 +121,78 @@ class FriendsQuery {
 //                }
 //            }
 //        }
+    }
+}
+
+class FriendsQueryCoroutine {
+    companion object {
+        suspend fun createUser(
+            userId: String,
+            friendIds: List<String> = emptyList()
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                FriendsQuery.createUser(
+                    userId, friendIds
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun getFriends(
+            userId: String
+        ): List<String>? {
+            return suspendCoroutine { continuation ->
+                FriendsQuery.getFriends(
+                    userId
+                ) { isSuccess, friends, log ->
+                    if (isSuccess) {
+                        continuation.resume(friends)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun deleteUser(
+            userId: String
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                FriendsQuery.deleteUser(
+                    userId
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun addFriend(
+            userId: String,
+            friendId: String
+        ): Unit {
+            return suspendCoroutine { continuation ->
+                FriendsQuery.addFriend(
+                    userId, friendId
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+        
+        //사용하지 않아 주석처리
+        //suspend fun deleteFriend
     }
 }
