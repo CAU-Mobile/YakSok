@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQuery
 import com.example.yaksok.query.AuthQuery
-import com.example.yaksok.query.FriendsQuery
 import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
 import com.google.firebase.Timestamp

@@ -69,6 +69,25 @@ class AppointmentQuery {
                 }
         }
 
+        fun getAppointmentsAddname(
+            memberId: String,
+            callBack: (Boolean, Map<String, Appointment>?, String?) -> Unit
+        ) {
+            appointmentsCollection.whereArrayContains("memberIds", memberId).get()
+                .addOnSuccessListener { appointments ->
+                    if (appointments.size() == 0) {
+                        callBack(false, null, "No Appointments!")
+                    } else {
+                        val appointmentsList = HashMap<String, Appointment>()
+                        appointments.forEach { appointmentsList[it.id] = it.toObject<Appointment>() }
+                        callBack(true, appointmentsList.toMap(), "Get Success!")
+                    }
+                }
+                .addOnFailureListener {
+                    callBack(false, null, it.toString())
+                }
+        }
+
         fun deleteAppointment(
             appointmentId: String,
             callBack: (Boolean, String?) -> Unit
