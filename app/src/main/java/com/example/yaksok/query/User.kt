@@ -92,6 +92,42 @@ class UsersQuery {
                 }
         }
 
+        fun getUserWithCode(
+            userCode: String,
+            callBack: (Boolean, User?, String?) -> Unit
+        ) {
+            getUserIdWithCode(userCode) { isSuccess1, userId, log ->
+                if (isSuccess1) {
+                    userId?.let {
+                        getUser(userId) { isSuccess2, user, log ->
+                            if (isSuccess2) {
+                                callBack(true, user, log)
+                            } else {
+                                callBack(false, null, log)
+                            }
+                        }
+                    }
+                } else {
+                    callBack(false, null, log)
+                }
+            }
+        }
+
+        fun getUserNameWithCode(
+            userCode: String,
+            callBack: (Boolean, String?, String?) -> Unit
+        ) {
+            getUserWithCode(userCode) { isSuccess, user, log ->
+                if (isSuccess) {
+                    user?.let {
+                        callBack(true, user.name, log)
+                    }
+                } else {
+                    callBack(false, null, log)
+                }
+            }
+        }
+
         fun checkUserExists(
             userId: String,
             callBack: (Boolean) -> Unit
