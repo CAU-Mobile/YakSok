@@ -1,7 +1,6 @@
 package com.example.yaksok
 
 import android.os.Bundle
-import com.example.yaksok.ui.login.LoginPage
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,44 +16,53 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yaksok.query.Appointment
-import com.example.yaksok.query.AppointmentQuery
 import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
-import com.example.yaksok.ui.friend.AddFriendToYaksokPage
-import com.example.yaksok.ui.friend.AddFriendsPage
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
 import com.example.yaksok.ui.SavedPlacesPage
 import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.YaksokViewModel
-import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
+import com.example.yaksok.ui.friend.AddFriendToYaksokPage
 import com.example.yaksok.ui.friend.AddFriendViewModel
+import com.example.yaksok.ui.friend.AddFriendsPage
+import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.login.LoginViewModel
+import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.login.RegisterViewModel
+import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var placesViewModel: PlacesViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val serviceLocator = (application as YakSokApplication).appContainer
+
+        placesViewModel =
+            serviceLocator.placesContainer.placesViewModelFactory.create(PlacesViewModel::class.java)
+
         enableEdgeToEdge()
         setContent {
             YakSokTheme {
                 val navController = rememberNavController()
-                val friendList = listOf("박수빈", "박예빈", "임결", "최지원", "이준우",
-                    "박수빈", "박예빈", "임결", "최지원", "이준우") //친구리스트 테스트용
+                val friendList = listOf(
+                    "박수빈", "박예빈", "임결", "최지원", "이준우",
+                    "박수빈", "박예빈", "임결", "최지원", "이준우"
+                ) //친구리스트 테스트용
                 val loginViewModel = LoginViewModel()
-                val registerViewModel= RegisterViewModel()
-                val AddFriendViewModel= AddFriendViewModel()
-                val YaksokViewModel=YaksokViewModel()
-                val userId=AuthQuery.getCurrentUserId()
+                val registerViewModel = RegisterViewModel()
+                val AddFriendViewModel = AddFriendViewModel()
+                val YaksokViewModel = YaksokViewModel()
+                val userId = AuthQuery.getCurrentUserId()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -94,8 +102,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("manageYaksok") {
                             ManageYaksokPage(
-                                goToYaksokDetailPage = {
-                                    appointmentId->
+                                goToYaksokDetailPage = { appointmentId ->
                                     navController.navigate("yaksokDetail/$appointmentId")  // 화면 전환
                                 },
                                 viewModel = YaksokViewModel
@@ -103,16 +110,17 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("createYaksok") {
                             CreateYaksokPage(
-                                goToAddFriendToYaksokPage ={navController.navigate("addFriendToYaksok")},
+                                goToAddFriendToYaksokPage = { navController.navigate("addFriendToYaksok") },
                                 viewModel = YaksokViewModel,
+                                placeViewModel = placesViewModel,
                                 goToManageYaksokPage = { navController.navigate("manageYaksok") },
-                                selectedFriends =  AddFriendViewModel.selectedFriends
+                                selectedFriends = AddFriendViewModel.selectedFriends
                             )
                         }
                         composable("addFriendToYaksok") {
                             if (userId != null) {
                                 AddFriendToYaksokPage(
-                                    userId=userId,
+                                    userId = userId,
                                     viewModel = AddFriendViewModel
                                 )
                             }
@@ -129,7 +137,8 @@ class MainActivity : ComponentActivity() {
 
                             LaunchedEffect(appointmentId) {
                                 if (appointmentId != null) {
-                                    appointment = AppointmentQueryCoroutine.getAppointment(appointmentId)
+                                    appointment =
+                                        AppointmentQueryCoroutine.getAppointment(appointmentId)
                                     isLoading = false
                                 }
                             }

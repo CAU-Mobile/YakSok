@@ -3,7 +3,6 @@ package com.example.yaksok.ui
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.util.Log
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.compose.foundation.BorderStroke
@@ -23,18 +22,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -42,9 +38,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yaksok.query.User
+import com.example.yaksok.ui.places.screen.PlaceSearchResultsDialog
+import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
-import com.google.type.Date
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Calendar
 import java.util.TimeZone
@@ -54,6 +51,7 @@ import java.util.TimeZone
 @Composable
 fun CreateYaksokPage(
     viewModel: YaksokViewModel,
+    placeViewModel: PlacesViewModel,
     goToAddFriendToYaksokPage: () -> Unit,
     selectedFriends: StateFlow<List<User>>,
     goToManageYaksokPage: () -> Unit
@@ -71,6 +69,9 @@ fun CreateYaksokPage(
     var selectedDate by remember { mutableStateOf(calendar.timeInMillis) }
     var selectedHour by remember { mutableStateOf(calendar.get(Calendar.HOUR_OF_DAY)) }
     var selectedMinute by remember { mutableStateOf(calendar.get(Calendar.MINUTE)) }
+
+    var showDialog by remember { mutableStateOf(false) }
+    val placeSelectionText by placeViewModel.placeSelectionText.collectAsState()
 
     fun showTimePickerDialog() {
         val timePickerDialog = TimePickerDialog(
@@ -186,7 +187,13 @@ fun CreateYaksokPage(
                 label = { Text("약속 장소") },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .onFocusChanged { focusState ->
+                        if (!focusState.isFocused && geoPoint.isNotBlank()) {
+                            placeViewModel.searchPlaces(geoPoint)
+                            showDialog = true
+                        }
+                    },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color.Gray,
@@ -194,6 +201,7 @@ fun CreateYaksokPage(
                     cursorColor = Color.Gray
                 )
             )
+
             TextField(
                 value = selectedDateTime,
                 onValueChange = { /* 값 변경할 필요 없음 */ },
@@ -240,7 +248,26 @@ fun CreateYaksokPage(
             ) {
                 Text("약속 만들기")
             }
+
         }
+
+        LaunchedEffect(placeSelectionText) {
+            if (placeSelectionText.isNotEmpty()) {
+                showDialog = true
+            }
+        }
+        if (showDialog) {
+            PlaceSearchResultsDialog(
+                results = placeSelectionText,
+                onDismiss = { showDialog = false },
+                onSelectPlace = { index ->
+                    placeViewModel.selectPlace(index)
+                    showDialog = false
+//                    onNavigateToDetails()
+                }
+            )
+        }
+
     }
     if (showCalender) {
         showDateTimePickerDialog()

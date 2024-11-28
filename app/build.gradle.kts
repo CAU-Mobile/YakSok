@@ -81,4 +81,19 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    //구글맵
+    implementation(libs.play.services.maps)
+
+    //android 맵 utils
+    implementation(libs.android.maps.utils)
+    implementation(libs.maps.utils.ktx)
+
+    //maps compose
+    implementation(libs.maps.compose)
+
+
 }
