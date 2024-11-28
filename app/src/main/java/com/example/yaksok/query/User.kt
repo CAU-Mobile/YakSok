@@ -189,6 +189,29 @@ class UsersQuery {
 
             return "$timePart1-$timePart2-$randomPart"
         }
+
+        fun getUserNumberByCode(friendCode: String, callBack: (Boolean, String?) -> Unit){
+            usersCollection
+                .whereEqualTo("userCode", friendCode)
+                .get()
+                .addOnSuccessListener { result ->
+                    if (!result.isEmpty) {
+                        val friend = result.documents.firstOrNull()?.toObject<User>()
+                        val phoneNumber = friend?.phoneNumber
+
+                        if (phoneNumber != null) {
+                            callBack(true, phoneNumber)
+                        } else {
+                            callBack(false, "Phone number not found")
+                        }
+                    } else {
+                        callBack(false, "Friend not found")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    callBack(false, exception.message)
+                }
+        }
     }
 }
 
@@ -333,6 +356,23 @@ class UsersQueryCoroutine {
                         continuation.resume(Unit)
                     } else {
                         continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+        suspend fun findUserNumberByCode(
+            friendCode: String,
+        ):String {
+            return suspendCoroutine { continuation ->
+                UsersQuery.getUserNumberByCode(friendCode){ isSuccess, result->
+                    if (isSuccess) {
+                        if (result != null) {
+                            continuation.resume(result) // 사용자 번호 반환
+                        } else {
+                            continuation.resumeWithException(Exception("Phone number is null"))
+                        }
+                    } else{
+                        continuation.resumeWithException(Exception("Null"))
                     }
                 }
             }

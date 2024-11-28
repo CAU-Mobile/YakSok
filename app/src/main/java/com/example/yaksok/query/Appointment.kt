@@ -39,8 +39,14 @@ class AppointmentQuery {
                 .addOnSuccessListener { documentReference ->
                     val documentId = documentReference.id
                     if (documentId != null) {
-                        val createdAppointment = appointment.copy(documentId = documentId)
-                        callBack(true, createdAppointment.toString(), "Create Success!")
+                        val updatedAppointment = appointment.copy(documentId = documentId)
+                        documentReference.set(updatedAppointment)
+                            .addOnSuccessListener {
+                                callBack(true, updatedAppointment.toString(), "Create Success!")
+                            }
+                            .addOnFailureListener { exception ->
+                                callBack(false, null, "Failed to update document: ${exception.message}")
+                            }
                     } else {
                         callBack(false, null, "Failed to get document ID.")
                     }

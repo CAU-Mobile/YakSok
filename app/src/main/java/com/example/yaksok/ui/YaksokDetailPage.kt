@@ -48,6 +48,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,136 +64,136 @@ fun YaksokDetailPage(
     appointment: Appointment,
     viewModel: YaksokViewModel
 ) {
-    val friendNumber by viewModel.friendNumber.observeAsState("")
+    LaunchedEffect(appointment.memberIds) {
+        appointment.memberIds.forEach { memberId ->
+            viewModel.loadFriendNumber(memberId)
 
-    Column(
+            viewModel.loadFriendName(memberId)
+        }
+    }
+
+    val friendNumbers by viewModel.friendNumbers.observeAsState(emptyMap())
+    val friendNames by viewModel.friendNames.observeAsState(emptyMap())
+
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(25.dp)
+            .padding(25.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = "약속 상세",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(58,58,58)
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Color(233,233,233))
-//                .border(2.dp, Color.Gray, RoundedCornerShape(20.dp))
-                .padding(25.dp)
-                .verticalScroll(rememberScrollState())
-
-        )
-        {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth(),
-
-                ) {
-                Text(
-                    text = appointment.name,
-                    fontSize = 25.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(58,58,58)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = DateTimeFormatter
-                        .ofPattern("yyyy년 MM월 dd일\r\nHH시 mm분")
-                        .withZone(ZoneId.of("Asia/Seoul"))
-                        .format(appointment.time.toDate().toInstant()),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Light,
-                    color = Color.Gray
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            // 선 긋기
-            Divider(
-                color = Color.LightGray,      // 선 색상
-                thickness = 1.dp,        // 선 두께
+        item {
+            Text(
+                text = "약속 상세",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(58, 58, 58)
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Column( modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(5.dp))
-            ) {
-                Text(
-                    text = "낫투두 낫토앤바 용산점"
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.yaksok_place_img),
-                    contentDescription = "약속 장소",
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+        item {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-//                    .clip(RoundedCornerShape(5.dp))
-                    .border(BorderStroke(1.dp, Color.LightGray))
-                    .padding(16.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(223, 242, 235))
+                    .padding(25.dp)
             ) {
-                Text(
-                    text = appointment.details,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.ExtraLight,
-                    color = Color(58,58,58)
-                )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-            Column {
-                 Text(
-                    text = "약속 참여자",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(58,58,58)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = appointment.name,
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(58, 58, 58)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = DateTimeFormatter
+                            .ofPattern("MM월 dd일\r\nHH시 mm분")
+                            .withZone(ZoneId.of("Asia/Seoul"))
+                            .format(appointment.time.toDate().toInstant()),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Light,
+                        color = Color(122, 178, 211)
+                    )
+                }
+                Divider(
+                    color = Color(122, 178, 211),      // 선 색상
+                    thickness = 1.dp,        // 선 두께
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                Column( modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(5.dp))
                 ) {
-                    items(appointment.memberIds) { memberId ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.profile),
-                                contentDescription = "약속 참여자",
-                                modifier = Modifier.size(30.dp)
-                            )
-                            Text(
-                                text = memberId,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Light,
-                                color = Color(58, 58, 58)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            // 친구 번호 표시
-                            Text(
-                                text = friendNumber,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Light,
-                                color = Color(58, 58, 58)
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                    }
+                    Text(
+                        text = "낫투두 낫토앤바 용산점"
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.yaksok_place_img),
+                        contentDescription = "약속 장소",
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+//                    .clip(RoundedCornerShape(5.dp))
+                        .border(BorderStroke(1.dp, Color(122, 178, 211)))
+                        .padding(16.dp)
+                ) {
+                    Text(
+                        text = appointment.details,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.ExtraLight,
+                        color = Color(58,58,58)
+                    )
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "약속 참여자",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(58,58,58)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        items(appointment.memberIds) { memberId ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.profile),
+                    contentDescription = "약속 참여자",
+                    modifier = Modifier.size(30.dp)
+                )
+                val friendName = friendNames[memberId] ?: "이름 가져오는중"
+                Text(
+                    text = friendName,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color(58, 58, 58)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                val friendNumber = friendNumbers[memberId] ?: "번호 가져오는 중"
+                // 친구 번호 표시
+                Text(
+                    text = friendNumber,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Light,
+                    color = Color(58, 58, 58)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
         }
     }
 }

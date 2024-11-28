@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = AddFriendViewModel
                             )
                         }
-                        composable("yaksokDetail/{appointment}") { backStackEntry ->
+                        composable("yaksokDetail/{appointmentId}") { backStackEntry ->
                             val appointmentId = backStackEntry.arguments?.getString("appointmentId")
                             var appointment by remember { mutableStateOf<Appointment?>(null) }
                             var isLoading by remember { mutableStateOf(true) }

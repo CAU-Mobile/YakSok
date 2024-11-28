@@ -71,29 +71,6 @@ class FriendsQuery {
                 callBack(false, it.message)
             }
         }
-
-        fun getFriendNumberByName(friendName: String, callBack: (Boolean, String?) -> Unit){
-            friendsCollection
-                .whereEqualTo("name", friendName)
-                .get()
-                .addOnSuccessListener { result ->
-                    if (!result.isEmpty) {
-                        val friend = result.documents.firstOrNull()?.toObject<User>()
-                        val phoneNumber = friend?.phoneNumber
-
-                        if (phoneNumber != null) {
-                            callBack(true, phoneNumber)
-                        } else {
-                            callBack(false, "Phone number not found")
-                        }
-                    } else {
-                        callBack(false, "Friend not found")
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    callBack(false, exception.message)
-                }
-        }
     }
 }
 
@@ -159,23 +136,6 @@ class FriendsQueryCoroutine {
                     if (isSuccess) {
                         continuation.resume(Unit)
                     } else {
-                        continuation.resumeWithException(Exception(log))
-                    }
-                }
-            }
-        }
-
-        suspend fun findFriendNumberByName(
-            friendName: String,
-        ):String {
-            return suspendCoroutine { continuation ->
-                FriendsQuery.getFriendNumberByName(
-                    friendName
-                ){
-                    isSuccess, log->
-                    if(isSuccess){
-                        continuation.resume(String.toString())
-                    } else{
                         continuation.resumeWithException(Exception(log))
                     }
                 }

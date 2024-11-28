@@ -39,6 +39,12 @@ class YaksokViewModel : ViewModel(){
     private val _showDateTimePicker = MutableStateFlow(false)
     val showDateTimePicker: StateFlow<Boolean> = _showDateTimePicker
 
+    private val _friendNumbers = MutableLiveData<Map<String, String>>(emptyMap())
+    val friendNumbers: LiveData<Map<String, String>> get() = _friendNumbers
+
+    private val _friendNames = MutableLiveData<Map<String, String>>(emptyMap())
+    val friendNames: LiveData<Map<String, String>> get() = _friendNames
+
     // DateTimePickerDialog를 표시하는 메서드
     fun showDateTimePickerDialog() {
         _showDateTimePicker.value = true
@@ -49,18 +55,36 @@ class YaksokViewModel : ViewModel(){
         _showDateTimePicker.value = false
     }
 
-    private val _friendNumber = MutableLiveData<String>()
-    val friendNumber: LiveData<String> get() = _friendNumber
-
     fun loadFriendNumber(
-        name: String
+        memberId : String
     ){
         viewModelScope.launch {
             try {
-                val number = FriendsQueryCoroutine.findFriendNumberByName(name)
-                _friendNumber.value = number
+                val number = UsersQueryCoroutine.findUserNumberByCode(memberId)
+                val updatedMap = _friendNumbers.value.orEmpty().toMutableMap()
+                updatedMap[memberId] = number
+                _friendNumbers.value = updatedMap
             } catch (e: Exception) {
-                _friendNumber.value = "번호를 가져올 수 없습니다."
+                val updatedMap = _friendNumbers.value.orEmpty().toMutableMap()
+                updatedMap[memberId] = "번호를 가져올 수 없습니다."
+                _friendNumbers.value = updatedMap
+            }
+        }
+    }
+
+    fun loadFriendName(
+        memberId : String
+    ){
+        viewModelScope.launch {
+            try {
+                val name = UsersQueryCoroutine.getUserNameWithCode(memberId)
+                val updatedMap = _friendNames.value.orEmpty().toMutableMap()
+                updatedMap[memberId] = name ?: "이름을 가져올 수 없습니다."
+                _friendNames.value = updatedMap
+            } catch (e: Exception) {
+                val updatedMap = _friendNames.value.orEmpty().toMutableMap()
+                updatedMap[memberId] = "이름을 가져올 수 없습니다."
+                _friendNames.value = updatedMap
             }
         }
     }
