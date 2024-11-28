@@ -3,7 +3,6 @@ package com.example.yaksok.query
 import android.annotation.SuppressLint
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -58,29 +57,6 @@ class FriendsQuery {
                 }
         }
 
-//        fun addFriend(
-//            userId: String,
-//            friendId: String,
-//            callBack: (Boolean, String?) -> Unit
-//        ) {
-//            getFriends(userId) { s, r, e ->
-//                if (s) {
-//                    val friendIds = r?.toMutableList()
-//                    friendIds?.add(friendId)
-//
-//                    friendsCollection.document(userId).update("friendIds", friendIds)
-//                        .addOnCompleteListener {
-//                            callBack(true, "Add Success!")
-//                        }
-//                        .addOnFailureListener {
-//                            callBack(false, it.toString())
-//                        }
-//                } else {
-//                    callBack(false, e)
-//                }
-//            }
-//        }
-
         fun addFriend(userId: String, friendId: String, callBack: (Boolean, String?) -> Unit) {
             db.runTransaction { transaction ->
                 val document = friendsCollection.document(userId)
@@ -96,31 +72,28 @@ class FriendsQuery {
             }
         }
 
-        //사용하지 않을거같아 일단 주석처리 해두겠습니다
-//        fun deleteFriend(
-//            userId: String,
-//            friendId: String,
-//            callBack: (Boolean, String?) -> Unit
-//        ) {
-//            getFriends(userId) { s, r, e ->
-//                if (s) {
-//                    val friendIds = r?.toMutableList()
-//                    if (friendIds?.remove(friendId) == true) {
-//                        friendsCollection.document(userId).update("friendIds", friendIds)
-//                            .addOnCompleteListener {
-//                                callBack(true, "Delete Success!")
-//                            }
-//                            .addOnFailureListener {
-//                                callBack(false, it.toString())
-//                            }
-//                    } else {
-//                        callBack(false, "Cannot find friend ID!")
-//                    }
-//                } else {
-//                    callBack(false, e)
-//                }
-//            }
-//        }
+        fun getFriendNumberByName(friendName: String, callBack: (Boolean, String?) -> Unit){
+            friendsCollection
+                .whereEqualTo("name", friendName)
+                .get()
+                .addOnSuccessListener { result ->
+                    if (!result.isEmpty) {
+                        val friend = result.documents.firstOrNull()?.toObject<User>()
+                        val phoneNumber = friend?.phoneNumber
+
+                        if (phoneNumber != null) {
+                            callBack(true, phoneNumber)
+                        } else {
+                            callBack(false, "Phone number not found")
+                        }
+                    } else {
+                        callBack(false, "Friend not found")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    callBack(false, exception.message)
+                }
+        }
     }
 }
 
@@ -186,6 +159,23 @@ class FriendsQueryCoroutine {
                     if (isSuccess) {
                         continuation.resume(Unit)
                     } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun findFriendNumberByName(
+            friendName: String,
+        ):String {
+            return suspendCoroutine { continuation ->
+                FriendsQuery.getFriendNumberByName(
+                    friendName
+                ){
+                    isSuccess, log->
+                    if(isSuccess){
+                        continuation.resume(String.toString())
+                    } else{
                         continuation.resumeWithException(Exception(log))
                     }
                 }

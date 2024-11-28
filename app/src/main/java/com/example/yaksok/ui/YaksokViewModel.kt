@@ -1,12 +1,15 @@
 package com.example.yaksok.ui
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQuery
 import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
+import com.example.yaksok.query.FriendsQueryCoroutine
 import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
 import com.example.yaksok.query.UsersQueryCoroutine
@@ -46,6 +49,22 @@ class YaksokViewModel : ViewModel(){
         _showDateTimePicker.value = false
     }
 
+    private val _friendNumber = MutableLiveData<String>()
+    val friendNumber: LiveData<String> get() = _friendNumber
+
+    fun loadFriendNumber(
+        name: String
+    ){
+        viewModelScope.launch {
+            try {
+                val number = FriendsQueryCoroutine.findFriendNumberByName(name)
+                _friendNumber.value = number
+            } catch (e: Exception) {
+                _friendNumber.value = "번호를 가져올 수 없습니다."
+            }
+        }
+    }
+
     //현재 유저의 유저코드까지 약속 데이터에 저장하는 코드
     //하...진짜 코드 드릅다 뇌빼고 때려넣음
     fun addYaksok(
@@ -69,7 +88,7 @@ class YaksokViewModel : ViewModel(){
                             geoPoint = geoPoint,
                             time = time,
                             memberIds = members
-                        ) { isSuccess, appointmentId, errorMessage ->
+                        ) { isSuccess, _, errorMessage ->
                             _isYaksokSuccess.value = isSuccess
                             _isYaksokError.value = if (!isSuccess) errorMessage else null
                         }
@@ -112,6 +131,8 @@ class YaksokViewModel : ViewModel(){
             }
         }
     }
+
+
 
 //    fun loadYaksokList() {
 //        viewModelScope.launch {

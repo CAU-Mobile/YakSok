@@ -12,6 +12,7 @@ import com.example.yaksok.query.FriendsQueryCoroutine
 import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
 import com.example.yaksok.query.UsersQuery.Companion.getUserIdWithCode
+import com.example.yaksok.query.UsersQueryCoroutine
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,6 +47,19 @@ class AddFriendViewModel : ViewModel() {
 
     private val _selectedFriends = MutableStateFlow<List<User>>(emptyList())
     val selectedFriends: StateFlow<List<User>> = _selectedFriends.asStateFlow()
+
+    private val _myUserCode = MutableStateFlow("")
+    val myUserCode : StateFlow<String> = _myUserCode.asStateFlow()
+
+    fun getMyUserCode() {
+        viewModelScope.launch {
+            val currentUserId = AuthQuery.getCurrentUserId()
+            Log.d("ViewModel", "currentUserId: $currentUserId")
+            _myUserCode.value = currentUserId?.let {
+                UsersQueryCoroutine.getUserCodeWithId(it)
+            } ?: "Null Exception"
+        }
+    }
 
     fun addFriend(friendId: String) {
         viewModelScope.launch() {

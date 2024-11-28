@@ -27,10 +27,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.example.yaksok.query.AuthQuery
+import com.example.yaksok.query.UsersQueryCoroutine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,9 +42,14 @@ fun AddFriendsPage (
     viewModel: AddFriendViewModel
 
 ) {
+    LaunchedEffect(Unit){
+        viewModel.getMyUserCode()
+    }
+
     var showSuccessDialog by remember { mutableStateOf(false) }
     var friendCode by remember { mutableStateOf("") } // TextField 상태 관리
     var friendId by remember { mutableStateOf("") }
+    val userCode by viewModel.myUserCode.collectAsState()
 
     Column(
         modifier = Modifier
@@ -94,6 +103,14 @@ fun AddFriendsPage (
         ) {
             Text("친구 추가")
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "나의 유저 코드:${userCode}",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(58, 58, 58)
+        )
+        Spacer(modifier = Modifier.height(16.dp))
     }
 
     // 성공 다이얼로그

@@ -1,6 +1,7 @@
 package com.example.yaksok.query
 
 import android.annotation.SuppressLint
+import androidx.room.util.copy
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
@@ -14,7 +15,8 @@ data class Appointment(
     val details: String="",
     val geoPoint: GeoPoint = GeoPoint(0.0, 0.0),
     val time: Timestamp = Timestamp.now(),
-    val memberIds: List<String> = emptyList()
+    val memberIds: List<String> = emptyList(),
+    val documentId: String? = null
 )
 
 class AppointmentQuery {
@@ -29,11 +31,19 @@ class AppointmentQuery {
             geoPoint: GeoPoint,
             time: Timestamp,
             memberIds: List<String>,
-            callBack: (Boolean, String?, String?) -> Unit
+            callBack: (Boolean, String?, String?) -> Unit,
         ) {
-            appointmentsCollection.add(Appointment(name, details, geoPoint, time, memberIds))
-                .addOnSuccessListener {
-                    callBack(true, it.id, "Create Success!")
+            val appointment = Appointment(name, details, geoPoint, time, memberIds)
+
+            appointmentsCollection.add(appointment)
+                .addOnSuccessListener { documentReference ->
+                    val documentId = documentReference.id
+                    if (documentId != null) {
+                        val createdAppointment = appointment.copy(documentId = documentId)
+                        callBack(true, createdAppointment.toString(), "Create Success!")
+                    } else {
+                        callBack(false, null, "Failed to get document ID.")
+                    }
                 }
                 .addOnFailureListener {
                     callBack(false, null, it.toString())
@@ -236,6 +246,12 @@ class AppointmentQueryCoroutine {
                             continuation.resumeWithException(Exception(log))
                         }
                 }
+            }
+        }
+        suspend fun getAppointmentId(
+            appointment: Appointment
+        ): Unit{
+            return suspendCoroutine { continuation ->
             }
         }
 

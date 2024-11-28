@@ -8,11 +8,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.yaksok.query.Appointment
+import com.example.yaksok.query.AppointmentQuery
+import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.ui.friend.AddFriendToYaksokPage
 import com.example.yaksok.ui.friend.AddFriendsPage
@@ -83,7 +94,10 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("manageYaksok") {
                             ManageYaksokPage(
-                                goToYaksokDetailPage = { navController.navigate("yaksokDetail") },
+                                goToYaksokDetailPage = {
+                                    appointmentId->
+                                    navController.navigate("yaksokDetail/$appointmentId")  // 화면 전환
+                                },
                                 viewModel = YaksokViewModel
                             )
                         }
@@ -108,8 +122,26 @@ class MainActivity : ComponentActivity() {
                                 viewModel = AddFriendViewModel
                             )
                         }
-                        composable("yaksokDetail") {
-                            YaksokDetailPage()
+                        composable("yaksokDetail/{appointment}") { backStackEntry ->
+                            val appointmentId = backStackEntry.arguments?.getString("appointmentId")
+                            var appointment by remember { mutableStateOf<Appointment?>(null) }
+                            var isLoading by remember { mutableStateOf(true) }
+
+                            LaunchedEffect(appointmentId) {
+                                if (appointmentId != null) {
+                                    appointment = AppointmentQueryCoroutine.getAppointment(appointmentId)
+                                    isLoading = false
+                                }
+                            }
+                            if (isLoading) {
+                                Text("Loading...", fontSize = 20.sp)
+                            } else {
+                                appointment?.let {
+                                    YaksokDetailPage(appointment = it, viewModel = YaksokViewModel)
+                                } ?: run {
+                                    Text("Appointment not found", fontSize = 20.sp)
+                                }
+                            }
                         }
                         composable("savedPlaces") {
                             SavedPlacesPage()

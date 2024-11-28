@@ -48,11 +48,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.yaksok.query.Appointment
+import com.example.yaksok.query.FriendsQuery
+import com.example.yaksok.query.FriendsQueryCoroutine
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YaksokDetailPage() {
+fun YaksokDetailPage(
+    appointment: Appointment,
+    viewModel: YaksokViewModel
+) {
+    val friendNumber by viewModel.friendNumber.observeAsState("")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -85,14 +97,17 @@ fun YaksokDetailPage() {
 
                 ) {
                 Text(
-                    text = "학생회 모임",
+                    text = appointment.name,
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(58,58,58)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "2024-12-25",
+                    text = DateTimeFormatter
+                        .ofPattern("yyyy년 MM월 dd일\r\nHH시 mm분")
+                        .withZone(ZoneId.of("Asia/Seoul"))
+                        .format(appointment.time.toDate().toInstant()),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Light,
                     color = Color.Gray
@@ -128,7 +143,7 @@ fun YaksokDetailPage() {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "밥을 먹는다. \n영화를 본다. \n노래방을 간다.",
+                    text = appointment.details,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.ExtraLight,
                     color = Color(58,58,58)
@@ -143,11 +158,11 @@ fun YaksokDetailPage() {
                     color = Color(58,58,58)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Column (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ){
-                     repeat(4) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(appointment.memberIds) { memberId ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -159,30 +174,25 @@ fun YaksokDetailPage() {
                                 modifier = Modifier.size(30.dp)
                             )
                             Text(
-                                text = "박수빈",
+                                text = memberId,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Light,
-                                color = Color(58,58,58)
+                                color = Color(58, 58, 58)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
+
+                            // 친구 번호 표시
                             Text(
-                                text = "010-1234-5678",
+                                text = friendNumber,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Light,
-                                color = Color(58,58,58)
+                                color = Color(58, 58, 58)
                             )
                         }
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
                     }
                 }
             }
         }
     }
-}
-
-
-@Preview
-@Composable
-fun YaksokDetailPagePreview() {
-    YaksokDetailPage()
 }
