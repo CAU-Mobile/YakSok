@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -21,10 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import java.util.Calendar
 import java.util.TimeZone
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteInputScreen(
     origin: String,
@@ -54,7 +58,12 @@ fun RouteInputScreen(
                 onOriginChange(it)
             },
             label = { Text("출발지") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color(223, 242, 235),
+                focusedIndicatorColor = Color(112, 178, 211),
+                unfocusedIndicatorColor = Color(185, 229, 232)
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -66,7 +75,12 @@ fun RouteInputScreen(
                 onDestinationChange(it)
             },
             label = { Text("목적지") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = TextFieldDefaults.textFieldColors(
+                containerColor = Color(223, 242, 235),
+                focusedIndicatorColor = Color(112, 178, 211),
+                unfocusedIndicatorColor = Color(185, 229, 232)
+            )
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -91,7 +105,8 @@ fun RouteInputScreen(
                             Pair(0, 0)
                         )
                     }
-                }
+                },
+                buttonColor = Color(122, 178, 211)
             )
             if (timeSelection != 0 && selectedTime != null) {
                 Text("    ${selectedTime!!.first}:${selectedTime!!.second}")
@@ -105,7 +120,8 @@ fun RouteInputScreen(
                     onTimeSelected = { time ->
                         selectedTime = time
                         showTimePicker = false
-                    }
+                    },
+                    buttonColor = Color(122, 178, 211)
                 )
             }
         }
@@ -129,7 +145,8 @@ fun RouteInputScreen(
                     selectedTime ?: Pair(0, 0)
                 )
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
         ) {
             Text("검색하기")
         }
@@ -139,10 +156,14 @@ fun RouteInputScreen(
 @Composable
 fun TimeSelectionButton(
     currentSelection: Int,
-    onSelectionChange: (Int) -> Unit
+    onSelectionChange: (Int) -> Unit,
+    buttonColor: Color
 ) {
     val options = listOf("시간 지정 없음", "출발시간 지정", "도착시간 지정")
-    Button(onClick = { onSelectionChange((currentSelection + 1) % options.size) }) {
+    Button(
+        onClick = { onSelectionChange((currentSelection + 1) % options.size) },
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+    ) {
         Text(text = options[currentSelection])
     }
 }
@@ -185,7 +206,8 @@ fun TimeSelectionButton(
 fun TimePickerDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    onTimeSelected: (Pair<Int, Int>) -> Unit
+    onTimeSelected: (Pair<Int, Int>) -> Unit,
+    buttonColor: Color
 ) {
     val koreaTimeZone = TimeZone.getTimeZone("Asia/Seoul")
     val currentTime = Calendar.getInstance(koreaTimeZone)
@@ -201,18 +223,27 @@ fun TimePickerDialog(
             TimePicker(
                 state = timePickerState,
             )
-            Button(onClick = onDismiss) {
-                Text("취소")
-            }
-            Button(onClick = {
-                onTimeSelected(
-                    Pair(
-                        timePickerState.hour,
-                        timePickerState.minute
-                    )
-                )
-            }) {
-                Text("확인")
+            Row {
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+                ) {
+                    Text("취소")
+                }
+
+                Button(
+                    onClick = {
+                        onTimeSelected(
+                            Pair(
+                                timePickerState.hour,
+                                timePickerState.minute
+                            )
+                        )
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+                ) {
+                    Text("확인")
+                }
             }
         }
     }

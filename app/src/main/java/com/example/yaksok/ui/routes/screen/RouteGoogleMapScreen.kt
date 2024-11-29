@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -97,8 +98,9 @@ fun GoogleMapScreen(
         Button(
             onClick = { isBottomSheetVisible = true },
             modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(74, 98, 138))
         ) {
             Text("자세히")
         }
