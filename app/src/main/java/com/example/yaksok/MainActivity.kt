@@ -38,10 +38,12 @@ import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.login.RegisterViewModel
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
+import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
 
 class MainActivity : ComponentActivity() {
     private lateinit var placesViewModel: PlacesViewModel
+    private lateinit var routeViewModel: DirectionsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +51,9 @@ class MainActivity : ComponentActivity() {
 
         placesViewModel =
             serviceLocator.placesContainer.placesViewModelFactory.create(PlacesViewModel::class.java)
+
+        routeViewModel =
+            serviceLocator.directionsContainer.directionsViewModelFactory.create(DirectionsViewModel::class.java)
 
         enableEdgeToEdge()
         setContent {
@@ -83,6 +88,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable("map") {
                             MapPage(
+                                routeViewModel = routeViewModel,
                                 goToCreateYaksokPage = { navController.navigate("createYaksok") }
                             )
                         }

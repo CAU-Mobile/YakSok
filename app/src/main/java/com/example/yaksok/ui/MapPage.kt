@@ -1,5 +1,7 @@
 package com.example.yaksok.ui
 
+import android.app.Activity
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,37 +26,92 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.yaksok.R
+import com.example.yaksok.YakSokApplication
+import com.example.yaksok.ui.routes.dialog.RouteDialog
+import com.example.yaksok.ui.routes.screen.GoogleMapScreen
+import com.example.yaksok.ui.routes.screen.RouteInputScreen
+import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapPage(
+    routeViewModel: DirectionsViewModel,
     goToCreateYaksokPage: () -> Unit
 ) {
+    val navController = rememberNavController()
+    var showDialog by remember { mutableStateOf(false) }
+    var origin by remember { mutableStateOf("") }
+    var destination by remember { mutableStateOf("") }
+    var timeState by remember { mutableStateOf(0) }
+    var selectedHourMinute by remember { mutableStateOf(Pair(0, 0)) }
+
+    val routes by routeViewModel.routeSelectionText.collectAsState(initial = emptyList())
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(223, 242, 235))
     ) {
-        // 본문 텍스트
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = "Map Page",
-                color = Color(58,58,58)
-            )
+
+        NavHost(navController = navController, startDestination = "inputScreen") {
+            composable("inputScreen") {
+                RouteInputScreen(
+                    origin = origin,
+                    destination = destination,
+                    onOriginChange = { origin = it },
+                    onDestinationChange = { destination = it },
+                    onTimeChange = { currentTimeState, selectedHM ->
+                        timeState = currentTimeState
+                        selectedHourMinute = selectedHM
+                    },
+                    onSearchClicked = { origin, destination, mode, timeSelectedState, selectedHourMinute ->
+                        routeViewModel.setEverything(
+                            origin,
+                            destination,
+                            mode,
+                            timeSelectedState,
+                            selectedHourMinute
+                        )
+                        showDialog = true
+                    }
+                )
+            }
+            composable("mapScreen") {
+                GoogleMapScreen(
+                    viewModel = routeViewModel,
+                    onBackPressed = { navController.popBackStack() }
+                )
+            }
         }
+//        // 본문 텍스트
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(horizontal = 32.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally,
+//            verticalArrangement = Arrangement.Center
+//        ) {
+//            Text(
+//                text = "Map Page",
+//                color = Color(58,58,58)
+//            )
+//        }
 
         // Floating Action Button (FAB)
         FloatingActionButton(
@@ -70,12 +127,24 @@ fun MapPage(
                 contentDescription = "Add"
             )
         }
+        if (showDialog) {
+            RouteDialog(
+                viewmodel = routeViewModel,
+                routes = routes,
+                onIndexSelected = { index ->
+                    routeViewModel.setSelectedRouteIndex(index)
+                    routeViewModel.selectRoute(index)
+                    showDialog = false
+                    navController.navigate("mapScreen")
+                },
+                onDismiss = { showDialog = false }
+            )
+        }
     }
-}
 
-
-@Preview
-@Composable
-fun MapPagePreview() {
-    MapPage({})
+    LaunchedEffect(routes) {
+        if (routes.isNotEmpty()) {
+            showDialog = true
+        }
+    }
 }

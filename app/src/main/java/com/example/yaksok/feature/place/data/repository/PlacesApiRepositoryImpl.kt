@@ -30,6 +30,7 @@ class PlacesApiRepositoryImpl(
         }
     }
 
+    //TODO api key 변경
     companion object {
         private const val API_KEY = "API_KEY_REPLACE"
     }
