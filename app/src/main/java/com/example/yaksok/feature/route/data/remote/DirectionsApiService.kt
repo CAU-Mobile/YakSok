@@ -13,7 +13,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String,
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "AIzaSyBjB8ZQ4-Dds48-gF6GvxPYYmoo0hyJF5U"
+        @Query("key") apiKey: String = "API_KEY_REPLACE"
 //        @Query("key") apiKey: String = com.google.maps.android.ktx.utils.BuildConfig.deb
     ): DirectionsResponse
 
@@ -29,7 +29,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "AIzaSyBjB8ZQ4-Dds48-gF6GvxPYYmoo0hyJF5U"
+        @Query("key") apiKey: String = "API_KEY_REPLACE"
     ): DirectionsResponse
 
     //출발시간
@@ -43,7 +43,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "AIzaSyBjB8ZQ4-Dds48-gF6GvxPYYmoo0hyJF5U"
+        @Query("key") apiKey: String = "API_KEY_REPLACE"
     ): DirectionsResponse
 
 
@@ -57,7 +57,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "AIzaSyBjB8ZQ4-Dds48-gF6GvxPYYmoo0hyJF5U"
+        @Query("key") apiKey: String = "API_KEY_REPLACE"
     ): DirectionsResponse
 
 }
