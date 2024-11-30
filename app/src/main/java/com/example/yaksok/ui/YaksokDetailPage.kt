@@ -2,6 +2,7 @@ package com.example.yaksok.ui
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.location.Location
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -251,6 +252,7 @@ fun YaksokDetailPage(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
+        var isFirst = true
         items(appointment.memberIds) { memberId ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -281,29 +283,66 @@ fun YaksokDetailPage(
                         color = Color(58, 58, 58)
                     )
                 }
-                currentDistance?.let { distanceValue ->
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "남은 거리: ${String.format("%.1f", distanceValue)}m",
-                            fontSize = 12.sp,
-                            color = Color.Gray
-                        )
-                        if (distanceValue <= 100) {
-                            Spacer(modifier = Modifier.width(8.dp))
+                if (isFirst) {
+                    currentDistance?.let { distanceValue ->
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Text(
-                                text = "도착 직전",
+                                text = "남은 거리: ${String.format("%.1f", distanceValue)}m",
                                 fontSize = 12.sp,
-                                color = Color(122, 178, 211),
-                                fontWeight = FontWeight.Bold
+                                color = Color.Gray
                             )
+                            if (distanceValue <= 100) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "도착 직전",
+                                    fontSize = 12.sp,
+                                    color = Color(122, 178, 211),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    //TODO 여기에서 다른 사람들 위치 받아와야 합니다
+                    val thisLocation = Location("").apply {
+                        //TODO 여기의 37~, 126~ 을 다른 사람들의 위치로 바꾸면 됩니다
+                        latitude = 37.5045563
+                        longitude = 126.9569379
+                    }
+                    distanceViewModel.calculateOthersDistance(
+                        thisLocation,
+                        destinationLat = appointment.placeLat ?: 37.5045563,
+                        destinationLng = appointment.placeLng ?: 126.9569379
+                    )
+                    val thisDistance = distanceViewModel.othersDistance
+                    thisDistance.let { distanceValue ->
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "남은 거리: ${String.format("%.1f", distanceValue)}m",
+                                fontSize = 12.sp,
+                                color = Color.Gray
+                            )
+                            if (distanceValue <= 100) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "도착 직전",
+                                    fontSize = 12.sp,
+                                    color = Color(122, 178, 211),
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
+            isFirst = false
         }
     }
 }
