@@ -10,13 +10,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,25 +33,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.example.yaksok.query.AuthQuery
-import com.example.yaksok.query.UsersQueryCoroutine
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFriendsPage (
+fun AddFriendsPage(
     viewModel: AddFriendViewModel
 
 ) {
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         viewModel.getMyUserCode()
     }
 
@@ -68,7 +65,7 @@ fun AddFriendsPage (
         // 친구 코드 입력 TextField
         TextField(
             value = friendId,
-            onValueChange = { friendId=it},
+            onValueChange = { friendId = it },
             placeholder = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -96,8 +93,10 @@ fun AddFriendsPage (
 
         // 친구 추가 버튼
         Button(
-            onClick = { viewModel.addFriend(friendId)
-                        showSuccessDialog = true},
+            onClick = {
+                viewModel.addFriend(friendId)
+                showSuccessDialog = true
+            },
             modifier = Modifier.align(Alignment.End),
             colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211)),
         ) {

@@ -1,7 +1,6 @@
 package com.example.yaksok.query
 
 import android.annotation.SuppressLint
-import androidx.room.util.copy
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
@@ -12,10 +11,20 @@ import kotlin.coroutines.suspendCoroutine
 
 data class Appointment(
     val name: String = "",
-    val details: String="",
+    val details: String = "",
     val geoPoint: GeoPoint = GeoPoint(0.0, 0.0),
     val time: Timestamp = Timestamp.now(),
     val memberIds: List<String> = emptyList(),
+
+    val placeName: String = "",
+    val placeAddress: String = "",
+    val placeGoogleUri: String = "",
+    val placeWebsite: String? = null,
+    val placeOpen: Boolean? = null,
+    val placeHours: List<String>? = emptyList(),
+    val placeLat: Double? = null,
+    val placeLng: Double? = null,
+
     val documentId: String? = null
 )
 
@@ -31,9 +40,31 @@ class AppointmentQuery {
             geoPoint: GeoPoint,
             time: Timestamp,
             memberIds: List<String>,
+            placeName: String,
+            placeAddress: String,
+            placeGoogleUri: String,
+            placeWebsite: String?,
+            placeOpen: Boolean?,
+            placeHours: List<String>?,
+            placeLat: Double?,
+            placeLng: Double?,
             callBack: (Boolean, String?, String?) -> Unit,
         ) {
-            val appointment = Appointment(name, details, geoPoint, time, memberIds)
+            val appointment = Appointment(
+                name,
+                details,
+                geoPoint,
+                time,
+                memberIds,
+                placeName,
+                placeAddress,
+                placeGoogleUri,
+                placeWebsite,
+                placeOpen,
+                placeHours,
+                placeLat,
+                placeLng
+            )
 
             appointmentsCollection.add(appointment)
                 .addOnSuccessListener { documentReference ->
@@ -45,7 +76,11 @@ class AppointmentQuery {
                                 callBack(true, updatedAppointment.toString(), "Create Success!")
                             }
                             .addOnFailureListener { exception ->
-                                callBack(false, null, "Failed to update document: ${exception.message}")
+                                callBack(
+                                    false,
+                                    null,
+                                    "Failed to update document: ${exception.message}"
+                                )
                             }
                     } else {
                         callBack(false, null, "Failed to get document ID.")
@@ -79,7 +114,9 @@ class AppointmentQuery {
                         callBack(false, null, "No Appointments!")
                     } else {
                         val appointmentsList = HashMap<String, Appointment>()
-                        appointments.forEach { appointmentsList[it.id] = it.toObject<Appointment>() }
+                        appointments.forEach {
+                            appointmentsList[it.id] = it.toObject<Appointment>()
+                        }
                         callBack(true, appointmentsList.toMap(), "Get Success!")
                     }
                 }
@@ -98,7 +135,9 @@ class AppointmentQuery {
                         callBack(false, null, "No Appointments!")
                     } else {
                         val appointmentsList = HashMap<String, Appointment>()
-                        appointments.forEach { appointmentsList[it.id] = it.toObject<Appointment>() }
+                        appointments.forEach {
+                            appointmentsList[it.id] = it.toObject<Appointment>()
+                        }
                         callBack(true, appointmentsList.toMap(), "Get Success!")
                     }
                 }
@@ -126,6 +165,16 @@ class AppointmentQuery {
             geoPoint: GeoPoint? = null,
             time: Timestamp? = null,
             memberIds: List<String>? = null,
+
+            placeName: String? = null,
+            placeAddress: String? = null,
+            placeGoogleUri: String? = null,
+            placeWebsite: String? = null,
+            placeOpen: Boolean? = null,
+            placeHours: List<String>? = emptyList(),
+            placeLat: Double? = null,
+            placeLng: Double? = null,
+
             callBack: (Boolean, String?) -> Unit
         ) {
             appointmentsCollection.document(appointmentId).get()
@@ -135,7 +184,17 @@ class AppointmentQuery {
                         "name", name ?: originAppointment?.name,
                         "geoPoint", geoPoint ?: originAppointment?.geoPoint,
                         "time", time ?: originAppointment?.time,
-                        "userIds", memberIds ?: originAppointment?.memberIds
+                        "userIds", memberIds ?: originAppointment?.memberIds,
+
+                        "placeName", placeName ?: originAppointment?.placeName,
+                        "placeAddress", placeAddress ?: originAppointment?.placeAddress,
+                        "placeGoogleUri", placeGoogleUri ?: originAppointment?.placeGoogleUri,
+                        "placeWebsite", placeWebsite ?: originAppointment?.placeWebsite,
+                        "placeOpen", placeOpen ?: originAppointment?.placeOpen,
+                        "placeHours", placeHours ?: originAppointment?.placeHours,
+                        "placeLat", placeLat ?: originAppointment?.placeLat,
+                        "placeLng", placeLng ?: originAppointment?.placeLng
+
                     )
                         .addOnSuccessListener {
                             callBack(true, "Update Success!")
@@ -208,17 +267,37 @@ class AppointmentQueryCoroutine {
             details: String,
             geoPoint: GeoPoint,
             time: Timestamp,
-            memberIds: List<String>
+            memberIds: List<String>,
+            placeName: String,
+            placeAddress: String,
+            placeGoogleUri: String,
+            placeWebsite: String?,
+            placeOpen: Boolean?,
+            placeHours: List<String>?,
+            placeLat: Double?,
+            placeLng: Double?
         ): String? {
             return suspendCoroutine { continuation ->
                 AppointmentQuery.createAppointment(
-                    name, details, geoPoint, time, memberIds
+                    name,
+                    details,
+                    geoPoint,
+                    time,
+                    memberIds,
+                    placeName,
+                    placeAddress,
+                    placeGoogleUri,
+                    placeWebsite,
+                    placeOpen,
+                    placeHours,
+                    placeLat,
+                    placeLng
                 ) { isSuccess, appointmentId, log ->
-                        if (isSuccess) {
-                            continuation.resume(appointmentId)
-                        } else {
-                            continuation.resumeWithException(Exception(log))
-                        }
+                    if (isSuccess) {
+                        continuation.resume(appointmentId)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
                 }
             }
         }
@@ -230,11 +309,11 @@ class AppointmentQueryCoroutine {
                 AppointmentQuery.getAppointment(
                     appointmentId
                 ) { isSuccess, appointment, log ->
-                        if (isSuccess) {
-                            continuation.resume(appointment)
-                        } else {
-                            continuation.resumeWithException(Exception(log))
-                        }
+                    if (isSuccess) {
+                        continuation.resume(appointment)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
                 }
             }
         }
@@ -246,17 +325,18 @@ class AppointmentQueryCoroutine {
                 AppointmentQuery.getAppointmentsWithUserId(
                     memberId
                 ) { isSuccess, resultMap, log ->
-                        if (isSuccess) {
-                            continuation.resume(resultMap)
-                        } else {
-                            continuation.resumeWithException(Exception(log))
-                        }
+                    if (isSuccess) {
+                        continuation.resume(resultMap)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
                 }
             }
         }
+
         suspend fun getAppointmentId(
             appointment: Appointment
-        ): Unit{
+        ): Unit {
             return suspendCoroutine { continuation ->
             }
         }
@@ -268,11 +348,11 @@ class AppointmentQueryCoroutine {
                 AppointmentQuery.deleteAppointment(
                     appointmentId
                 ) { isSuccess, log ->
-                        if (isSuccess) {
-                            continuation.resume(Unit)
-                        } else {
-                            continuation.resumeWithException(Exception(log))
-                        }
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
                 }
             }
         }
@@ -282,11 +362,31 @@ class AppointmentQueryCoroutine {
             name: String? = null,
             geoPoint: GeoPoint? = null,
             time: Timestamp? = null,
-            memberIds: List<String>? = null
+            memberIds: List<String>? = null,
+            placeName: String? = null,
+            placeAddress: String? = null,
+            placeGoogleUri: String? = null,
+            placeWebsite: String? = null,
+            placeOpen: Boolean? = null,
+            placeHours: List<String>? = null,
+            placeLat: Double? = null,
+            placeLng: Double? = null
         ): Unit {
             return suspendCoroutine { continuation ->
                 AppointmentQuery.updateAppointment(
-                    appointmentId, name, geoPoint, time, memberIds
+                    appointmentId,
+                    name,
+                    geoPoint,
+                    time,
+                    memberIds,
+                    placeName,
+                    placeAddress,
+                    placeGoogleUri,
+                    placeWebsite,
+                    placeOpen,
+                    placeHours,
+                    placeLat,
+                    placeLng
                 ) { isSuccess, log ->
                     if (isSuccess) {
                         continuation.resume(Unit)

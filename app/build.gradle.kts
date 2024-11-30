@@ -1,8 +1,15 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
 }
+
+val properties = Properties().apply {
+    load(rootProject.file("local.properties").inputStream())
+}
+val mapsApiKey = properties.getProperty("MAPS_API_KEY")
 
 android {
     namespace = "com.example.yaksok"
@@ -22,7 +29,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "MAPS_API_KEY", mapsApiKey)
+            manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        }
         release {
+            buildConfigField("String", "MAPS_API_KEY", mapsApiKey)
+            manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -38,6 +51,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {
@@ -63,6 +77,8 @@ dependencies {
     implementation(libs.androidx.room.runtime.android)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.play.services.location)
+    implementation(libs.places)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -85,9 +101,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
 
-    //구글맵
-    implementation(libs.play.services.maps)
-
     //android 맵 utils
     implementation(libs.android.maps.utils)
     implementation(libs.maps.utils.ktx)
@@ -95,5 +108,7 @@ dependencies {
     //maps compose
     implementation(libs.maps.compose)
 
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)
 
 }

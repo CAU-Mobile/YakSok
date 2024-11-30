@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yaksok.query.AppointmentQuery
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.query.FriendsQuery
 import com.example.yaksok.query.FriendsQueryCoroutine
@@ -13,7 +12,6 @@ import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
 import com.example.yaksok.query.UsersQuery.Companion.getUserIdWithCode
 import com.example.yaksok.query.UsersQueryCoroutine
-import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +23,7 @@ class AddFriendViewModel : ViewModel() {
     val isLoggedIn: StateFlow<Boolean> = _isAddSuccess
 
     private val _isAddError = MutableStateFlow<String?>("아이디가 존재하지 않습니다.") //아이디가 존재하지 않거나 등
-    val isAddError : StateFlow<String?> = _isAddError
+    val isAddError: StateFlow<String?> = _isAddError
 
 
     //친구 약속에 추가 항목
@@ -49,7 +47,7 @@ class AddFriendViewModel : ViewModel() {
     val selectedFriends: StateFlow<List<User>> = _selectedFriends.asStateFlow()
 
     private val _myUserCode = MutableStateFlow("")
-    val myUserCode : StateFlow<String> = _myUserCode.asStateFlow()
+    val myUserCode: StateFlow<String> = _myUserCode.asStateFlow()
 
     fun getMyUserCode() {
         viewModelScope.launch {
@@ -78,7 +76,7 @@ class AddFriendViewModel : ViewModel() {
                 if (friendsList.isNullOrEmpty()) {
                     //친구목록이 없으면 Friends.createUser 해야함.
                     FriendsQuery.createUser(currentUserId) { success, message ->
-                        if (success){
+                        if (success) {
                             addFriendToUser(currentUserId, friendId)
                         } else {
                             _isAddError.value = message ?: "친구목록 생성 실패"
@@ -147,6 +145,7 @@ class AddFriendViewModel : ViewModel() {
             this[friend.userCode] = true
         }
     }
+
     fun removeFriendFromYaksok(friend: User) {
         _selectedFriends.value -= friend
         _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {

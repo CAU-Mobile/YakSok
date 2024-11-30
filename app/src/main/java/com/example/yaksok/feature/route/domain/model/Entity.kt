@@ -1,9 +1,5 @@
 package com.example.yaksok.feature.route.domain.model
 
-//TODO 여기 routeEntity 로 바꾸기
-//TODO routeModel 추가하기, mapper,
-//TODO 뷰모델 model 추가하기,usecase? .toModel() 검색
-//TODO response route 붙이기
 data class DirectionsEntity(
     val routes: List<DirectionsRouteEntity>,
     val directionsStatus: String,

@@ -32,7 +32,6 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-//TODO 여기 이름 routesViewModel로 바꾸기
 class DirectionsViewModel(
     private val getDirectionsUseCase: GetDirectionsUseCase,
     private val getDirWithDepTmRpUseCase: GetDirWithDepTmRpUseCase,
@@ -73,7 +72,7 @@ class DirectionsViewModel(
     private val _selectedTime = MutableStateFlow<LocalTime?>(null)
     val selectedTime: StateFlow<LocalTime?> = _selectedTime
 
-//    //경로 선택하기 전 보여줄 간단한 소개들
+    //    //경로 선택하기 전 보여줄 간단한 소개들
     private val _routeSelectionText = MutableStateFlow<List<String>>(emptyList())
     val routeSelectionText: StateFlow<List<String>> get() = _routeSelectionText
 
@@ -84,10 +83,6 @@ class DirectionsViewModel(
     private val _polylines = MutableStateFlow<List<PolylineOptions>>(emptyList())
     val polylines: StateFlow<List<PolylineOptions>> = _polylines
 
-
-    private var _userLocation = MutableLiveData<LatLng>()
-    val userLocation: LiveData<LatLng> get() = _userLocation
-
     private var _destLocationLatLng = MutableLiveData<LatLng>()
     val destLocationLatLng: LiveData<LatLng> get() = _destLocationLatLng
 
@@ -96,9 +91,6 @@ class DirectionsViewModel(
 
     private var _startLocation = MutableLiveData<LatLng>()
     val startLocation: LiveData<LatLng> get() = _startLocation
-
-    private val _country = MutableLiveData<String>()
-    val country: LiveData<String> = _country
 
     private var _passedOrigin = MutableStateFlow<String>("")
     val passedOrigin: StateFlow<String> get() = _passedOrigin
@@ -121,13 +113,8 @@ class DirectionsViewModel(
     val mapBounds: StateFlow<LatLngBounds?> = _mapBounds
     //
 
-    fun changeIsDepArrNone() {
-        _isDepArrNone.value = when (_isDepArrNone.value) {
-            0 -> 1
-            1 -> 2
-            else -> 0
-        }
-    }
+    private val _showRouteDialog = MutableStateFlow(false)
+    val showRouteDialog: StateFlow<Boolean> get() = _showRouteDialog
 
     fun setEverything(
         origin: String,
@@ -152,7 +139,6 @@ class DirectionsViewModel(
             "transit" -> {
                 getDirByTransit()
             }
-
             else -> fetchDirections()
         }
     }
@@ -360,10 +346,13 @@ class DirectionsViewModel(
         }
     }
 
+    fun closeRouteDialog() {
+        _showRouteDialog.value = false
+    }
+
     fun afterSelecting() {
         viewModelScope.launch(Dispatchers.Default) {
             updatePolyLineWithColors()
-            //setShortDirectionsResult()
             updateMapBounds()
             setDirectionsResult()
         }
@@ -439,6 +428,7 @@ class DirectionsViewModel(
             routeIndex++
         }
         Log.d("확인 리스트 인덱스", "${resultsList.size}")
+        _showRouteDialog.value = true
         _routeSelectionText.value = resultsList
         Log.d("확인 setDirections", "stringbuilder ${resultsList}")
     }

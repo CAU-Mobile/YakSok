@@ -53,7 +53,7 @@ fun ManageYaksokPage(
             text = "나의 약속",
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(58,58,58)
+            color = Color(58, 58, 58)
         )
         LazyColumn(
             modifier = Modifier
@@ -62,8 +62,8 @@ fun ManageYaksokPage(
                 .clip(RoundedCornerShape(16.dp))
                 .padding(16.dp)
                 .background(Color(230, 230, 230))
-        ){
-            items(yaksokList){ appointment ->
+        ) {
+            items(yaksokList) { appointment ->
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -102,27 +102,26 @@ fun ManageYaksokPage(
                         thickness = 1.dp,        // 선 두께
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row(
+
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "장소 : ${appointment.geoPoint}",  // 장소
+                            text = "장소 : ${appointment.placeName}",
                             fontSize = 15.sp,
                             color = Color.Black
                         )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                        Text(
+                            text = "위치 : ${appointment.placeAddress}",  // 장소
+                            fontSize = 15.sp,
+                            color = Color.Black
+                        )
                         Text(
                             text = "참여자 : ${appointment.memberIds.joinToString(", ")}", // 참여자
                             fontSize = 15.sp,
                             color = Color.Black
                         )
+
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp)) // 각 항목 사이에 여백 추가

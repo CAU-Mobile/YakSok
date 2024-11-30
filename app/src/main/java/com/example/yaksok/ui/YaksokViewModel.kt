@@ -5,32 +5,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.yaksok.feature.place.presentation.model.PlaceModel
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQuery
 import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
-import com.example.yaksok.query.FriendsQueryCoroutine
 import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
 import com.example.yaksok.query.UsersQueryCoroutine
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.GeoPoint
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-class YaksokViewModel : ViewModel(){
+class YaksokViewModel : ViewModel() {
 
     private val _isYaksokSuccess = MutableStateFlow(false)
     val isYaksokSuccess: StateFlow<Boolean> = _isYaksokSuccess.asStateFlow()
 
     private val _isYaksokError = MutableStateFlow<String?>("약속생성 실패.") //아이디가 존재하지 않거나 등
-    val isYaksokError : StateFlow<String?> = _isYaksokError.asStateFlow()
+    val isYaksokError: StateFlow<String?> = _isYaksokError.asStateFlow()
 
     private val _YaksokList = MutableStateFlow<List<Appointment>>(emptyList())
     val YaksokList: StateFlow<List<Appointment>> = _YaksokList.asStateFlow()
@@ -56,8 +54,8 @@ class YaksokViewModel : ViewModel(){
     }
 
     fun loadFriendNumber(
-        memberId : String
-    ){
+        memberId: String
+    ) {
         viewModelScope.launch {
             try {
                 val number = UsersQueryCoroutine.findUserNumberByCode(memberId)
@@ -73,8 +71,8 @@ class YaksokViewModel : ViewModel(){
     }
 
     fun loadFriendName(
-        memberId : String
-    ){
+        memberId: String
+    ) {
         viewModelScope.launch {
             try {
                 val name = UsersQueryCoroutine.getUserNameWithCode(memberId)
@@ -94,9 +92,10 @@ class YaksokViewModel : ViewModel(){
     fun addYaksok(
         name: String,
         details: String,
-        geoPoint: GeoPoint,
+//        geoPoint: GeoPoint,
         time: Timestamp,
-        friendList: StateFlow<List<User>>
+        friendList: StateFlow<List<User>>,
+        selectedPlace: PlaceModel
     ) {
         viewModelScope.launch {
             AuthQuery.getCurrentUserId()?.let { currentUserId ->
@@ -106,56 +105,69 @@ class YaksokViewModel : ViewModel(){
                         val members = mutableListOf(currentUserCode)
                         members.addAll(friendList.value.map { it.userCode })
 
+
                         AppointmentQuery.createAppointment(
                             name = name,
                             details = details,
-                            geoPoint = geoPoint,
+                            geoPoint = GeoPoint(
+                                selectedPlace.location.latitude,
+                                selectedPlace.location.longitude
+                            ),
                             time = time,
-                            memberIds = members
+                            memberIds = members,
+                            placeName = selectedPlace.displayName.text,
+                            placeAddress = selectedPlace.formattedAddress,
+                            placeGoogleUri = selectedPlace.googleMapsUri,
+                            placeWebsite = selectedPlace.websiteUri,
+                            placeOpen = selectedPlace.currentOpeningHours?.openNow,
+                            placeHours = selectedPlace.currentOpeningHours?.weekdayDescriptions,
+                            placeLat = selectedPlace.location.latitude,
+                            placeLng = selectedPlace.location.longitude
                         ) { isSuccess, _, errorMessage ->
                             _isYaksokSuccess.value = isSuccess
                             _isYaksokError.value = if (!isSuccess) errorMessage else null
                         }
-                    }
-                    else {
+                    } else {
                         // 현재 유저의 userCode를 가져오지 못한 경우 처리
-                        _isYaksokError.value = errorMessage ?: "Failed to retrieve current user code"
+                        _isYaksokError.value =
+                            errorMessage ?: "Failed to retrieve current user code"
                     }
                 }
             }
         }
     }
-    fun loadYaksokList() {
-        viewModelScope.launch{
-            AuthQuery.getCurrentUserId()?.let { currentUserId ->
-                val currentUserCode= UsersQueryCoroutine.getUserCodeWithId(currentUserId)
-                    if (currentUserCode != null) {
-                        try {
-                            val appointments = AppointmentQueryCoroutine.getAppointmentsWithUserId(currentUserCode)
-                            if (appointments != null) {
-                                val updatedAppointments = appointments.values.map { appointment ->
-                                    val memberNames = appointment.memberIds.map { memberId ->
-                                        async {
-                                            UsersQueryCoroutine.getUserWithCode(memberId)?.name
-                                        }
-                                    }.awaitAll().filterNotNull()
-                                    appointment.copy(memberIds = memberNames)
-                                }
 
-                                // 결과 업데이트
-                                _YaksokList.value = updatedAppointments
-                            } else {
-                                _YaksokList.value = emptyList()
-                                _isYaksokError.value = "Failed to load appointments"
+    fun loadYaksokList() {
+        viewModelScope.launch {
+            AuthQuery.getCurrentUserId()?.let { currentUserId ->
+                val currentUserCode = UsersQueryCoroutine.getUserCodeWithId(currentUserId)
+                if (currentUserCode != null) {
+                    try {
+                        val appointments =
+                            AppointmentQueryCoroutine.getAppointmentsWithUserId(currentUserCode)
+                        if (appointments != null) {
+                            val updatedAppointments = appointments.values.map { appointment ->
+                                val memberNames = appointment.memberIds.map { memberId ->
+                                    async {
+                                        UsersQueryCoroutine.getUserWithCode(memberId)?.name
+                                    }
+                                }.awaitAll().filterNotNull()
+                                appointment.copy(memberIds = memberNames)
                             }
-                        } catch (e: Exception) {
-                            _isYaksokError.value = e.message ?: "An error occurred"
+
+                            // 결과 업데이트
+                            _YaksokList.value = updatedAppointments
+                        } else {
+                            _YaksokList.value = emptyList()
+                            _isYaksokError.value = "Failed to load appointments"
                         }
+                    } catch (e: Exception) {
+                        _isYaksokError.value = e.message ?: "An error occurred"
                     }
+                }
             }
         }
     }
-
 
 
 //    fun loadYaksokList() {

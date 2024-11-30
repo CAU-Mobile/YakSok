@@ -1,5 +1,6 @@
 package com.example.yaksok.feature.route.data.remote
 
+import com.example.yaksok.BuildConfig
 import com.example.yaksok.feature.route.data.model.DirectionsResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -13,8 +14,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String,
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "API_KEY_REPLACE"
-//        @Query("key") apiKey: String = com.google.maps.android.ktx.utils.BuildConfig.deb
+        @Query("key") apiKey: String = BuildConfig.MAPS_API_KEY
     ): DirectionsResponse
 
 
@@ -29,7 +29,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "API_KEY_REPLACE"
+        @Query("key") apiKey: String = BuildConfig.MAPS_API_KEY
     ): DirectionsResponse
 
     //출발시간
@@ -43,7 +43,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "API_KEY_REPLACE"
+        @Query("key") apiKey: String = BuildConfig.MAPS_API_KEY
     ): DirectionsResponse
 
 
@@ -57,7 +57,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "API_KEY_REPLACE"
+        @Query("key") apiKey: String = "AIzaSyBjB8ZQ4-Dds48-gF6GvxPYYmoo0hyJF5U"
     ): DirectionsResponse
 
 }

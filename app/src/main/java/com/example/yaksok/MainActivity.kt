@@ -30,6 +30,7 @@ import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.YaksokViewModel
 import com.example.yaksok.ui.components.CommonBottomAppBar
 import com.example.yaksok.ui.components.CommonTopAppBar
+import com.example.yaksok.ui.distance.viewModel.DistanceViewModel
 import com.example.yaksok.ui.friend.AddFriendToYaksokPage
 import com.example.yaksok.ui.friend.AddFriendViewModel
 import com.example.yaksok.ui.friend.AddFriendsPage
@@ -69,6 +70,7 @@ class MainActivity : ComponentActivity() {
                 val YaksokViewModel = YaksokViewModel()
                 val userId = AuthQuery.getCurrentUserId()
 
+                val distanceViewModel = DistanceViewModel()
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.Transparent, // Scaffold 배경색 투명 설정
@@ -89,6 +91,7 @@ class MainActivity : ComponentActivity() {
                         composable("map") {
                             MapPage(
                                 routeViewModel = routeViewModel,
+                                placesViewmodel = placesViewModel,
                                 goToCreateYaksokPage = { navController.navigate("createYaksok") }
                             )
                         }
@@ -152,7 +155,11 @@ class MainActivity : ComponentActivity() {
                                 Text("Loading...", fontSize = 20.sp)
                             } else {
                                 appointment?.let {
-                                    YaksokDetailPage(appointment = it, viewModel = YaksokViewModel)
+                                    YaksokDetailPage(
+                                        appointment = it,
+                                        viewModel = YaksokViewModel,
+                                        distanceViewModel = distanceViewModel
+                                    )
                                 } ?: run {
                                     Text("Appointment not found", fontSize = 20.sp)
                                 }

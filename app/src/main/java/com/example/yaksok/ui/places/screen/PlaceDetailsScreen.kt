@@ -49,12 +49,10 @@ fun PlaceDetailsScreen(viewModel: PlacesViewModel) {
                     state = MarkerState(
                         position = LatLng(place.location.latitude, place.location.longitude)
                     ),
-                    title = place.name
+                    title = place.displayName.text
                 )
             }
         }
-
-
 
         selectedPlace?.let { place ->
             Column(modifier = Modifier.padding(16.dp)) {

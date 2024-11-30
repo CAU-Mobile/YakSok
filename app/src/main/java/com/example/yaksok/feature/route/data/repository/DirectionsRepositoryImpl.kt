@@ -4,7 +4,6 @@ import com.example.yaksok.feature.route.data.remote.DirectionsApiService
 import com.example.yaksok.feature.route.domain.model.DirectionsEntity
 import com.example.yaksok.feature.route.domain.repository.DirectionsRepository
 
-//TODO directions를 route로 바꾸기...
 class DirectionsRepositoryImpl(
     private val apiService: DirectionsApiService
 ) : DirectionsRepository {

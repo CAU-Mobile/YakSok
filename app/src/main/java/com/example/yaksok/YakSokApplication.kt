@@ -1,14 +1,18 @@
 package com.example.yaksok
 
 import android.app.Application
+import com.google.android.libraries.places.api.Places
+import com.google.firebase.Firebase
+import com.google.firebase.initialize
 
 class YakSokApplication : Application() {
     val appContainer = ServiceLocator()
 
     override fun onCreate() {
         APPINSTANCE = this
-        //TODO 파이어베이스 초기화작업
+        Firebase.initialize(this)
 
+        Places.initialize(applicationContext, BuildConfig.MAPS_API_KEY)
         super.onCreate()
     }
 

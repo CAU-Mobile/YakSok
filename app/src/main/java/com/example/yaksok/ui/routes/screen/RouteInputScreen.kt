@@ -1,5 +1,7 @@
 package com.example.yaksok.ui.routes.screen
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,14 +19,20 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import com.example.yaksok.ui.places.dialog.PlaceSearchResultsDialog
+import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -33,6 +41,7 @@ import java.util.TimeZone
 fun RouteInputScreen(
     origin: String,
     destination: String,
+    placeViewModel: PlacesViewModel,
     onOriginChange: (String) -> Unit,
     onDestinationChange: (String) -> Unit,
     onTimeChange: (Int, Pair<Int, Int>) -> Unit,
@@ -45,10 +54,25 @@ fun RouteInputScreen(
     var showTimePicker by remember { mutableStateOf(false) }
     var selectedTime by remember { mutableStateOf<Pair<Int, Int>?>(null) }
 
+    val focusManager = LocalFocusManager.current
+
+    val showPlaceDialog by placeViewModel.showPlaceDialog.collectAsState()
+    val placeSelectionText by placeViewModel.placeSelectionText.collectAsState()
+
+    LaunchedEffect(Unit) {
+        placeViewModel.closePlaceDialog()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) {
+                focusManager.clearFocus()
+            },
         verticalArrangement = Arrangement.Center
     ) {
         TextField(
@@ -58,7 +82,16 @@ fun RouteInputScreen(
                 onOriginChange(it)
             },
             label = { Text("출발지") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused && currentOrigin.isNotBlank()) {
+                        placeViewModel.searchPlacesForRoute(
+                            currentOrigin,
+                            isOrigin = true
+                        )
+                    }
+                },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(223, 242, 235),
                 focusedIndicatorColor = Color(112, 178, 211),
@@ -75,7 +108,16 @@ fun RouteInputScreen(
                 onDestinationChange(it)
             },
             label = { Text("목적지") },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused && currentDestination.isNotBlank()) {
+                        placeViewModel.searchPlacesForRoute(
+                            currentDestination,
+                            isOrigin = false
+                        )
+                    }
+                },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color(223, 242, 235),
                 focusedIndicatorColor = Color(112, 178, 211),
@@ -138,8 +180,8 @@ fun RouteInputScreen(
         Button(
             onClick = {
                 onSearchClicked(
-                    currentOrigin,
-                    currentDestination,
+                    placeViewModel.getSelectedOriginAddress().ifEmpty { currentOrigin },
+                    placeViewModel.getSelectedDestinationAddress().ifEmpty { currentDestination },
                     selectedMode,
                     timeSelection,
                     selectedTime ?: Pair(0, 0)
@@ -151,6 +193,17 @@ fun RouteInputScreen(
             Text("검색하기")
         }
     }
+    if (showPlaceDialog) {
+        PlaceSearchResultsDialog(
+            results = placeSelectionText,
+            onDismiss = { placeViewModel.closePlaceDialog() },
+            onSelectPlace = { index ->
+                placeViewModel.selectPlaceForRoute(index)
+                placeViewModel.closePlaceDialog()
+            }
+        )
+    }
+
 }
 
 @Composable
@@ -223,7 +276,10 @@ fun TimePickerDialog(
             TimePicker(
                 state = timePickerState,
             )
-            Row {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(containerColor = buttonColor)

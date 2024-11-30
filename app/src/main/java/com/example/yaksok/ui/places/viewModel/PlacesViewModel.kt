@@ -23,16 +23,44 @@ class PlacesViewModel(
     private var _selectedPlace = MutableStateFlow<PlaceModel?>(null)
     val selectedPlace: StateFlow<PlaceModel?> get() = _selectedPlace
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    private var _selectedPlaceForRoute: PlaceModel? = null
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    private val _showPlaceDialog = MutableStateFlow(false)
+    val showPlaceDialog: StateFlow<Boolean> get() = _showPlaceDialog
+
+    private var _selectedOriginAddress: String = ""
+    private var _selectedDestinationAddress: String = ""
+
+    var isSelectingOrigin: Boolean = true
+        private set
 
     fun searchPlaces(
         query: String
     ) {
         viewModelScope.launch {
+            resetState()
+            val result = getSearchListUseCase(
+                query
+            )
+            result.onSuccess { placeListEntity ->
+                _searchResults.value = placeListEntity.toModel()
+                makePlaceSelectionText()
+            }.onFailure { error ->
+                _error.value = error.message
+            }
+        }
+    }
+
+    fun searchPlacesForRoute(
+        query: String,
+        isOrigin: Boolean
+    ) {
+        viewModelScope.launch {
+            resetState()
+            isSelectingOrigin = isOrigin
             val result = getSearchListUseCase(
                 query
             )
@@ -47,8 +75,17 @@ class PlacesViewModel(
 
     fun makePlaceSelectionText() {
         _placeSelectionText.value = _searchResults.value?.places?.map { place ->
-            "${place.displayName.text}\n${place.formattedAddress}"
+            "🔷${place.displayName.text}\n${place.formattedAddress}"
         } ?: emptyList()
+        if (placeSelectionText.value.isNotEmpty()) {
+            _showPlaceDialog.value = true
+        } else {
+            _showPlaceDialog.value = false
+        }
+    }
+
+    fun closePlaceDialog() {
+        _showPlaceDialog.value = false
     }
 
     fun selectPlace(
@@ -57,6 +94,29 @@ class PlacesViewModel(
         searchResults.value?.places?.getOrNull(index)?.let {
             _selectedPlace.value = it
         }
+    }
+
+    fun selectPlaceForRoute(
+        index: Int
+    ) {
+        _selectedPlaceForRoute = _searchResults.value?.places?.getOrNull(index)
+        _selectedPlaceForRoute?.let {
+            if (isSelectingOrigin) {
+                _selectedOriginAddress = it.formattedAddress
+            } else {
+                _selectedDestinationAddress = it.formattedAddress
+            }
+        }
+    }
+
+    fun getSelectedOriginAddress(): String = _selectedOriginAddress
+    fun getSelectedDestinationAddress(): String = _selectedDestinationAddress
+
+    fun resetState() {
+        _showPlaceDialog.value = false
+        _placeSelectionText.value = emptyList()
+        _selectedPlace.value = null
+        _searchResults.value = null
     }
 }
 

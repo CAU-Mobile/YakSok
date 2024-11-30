@@ -31,11 +31,10 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
-//TODO googleMapScreen 앞에 Route 붙이기
 @Composable
 fun GoogleMapScreen(
     viewModel: DirectionsViewModel,
-    onBackPressed: () -> Unit,
+    navigateToInput: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     viewModel.afterSelecting()
@@ -59,9 +58,8 @@ fun GoogleMapScreen(
         }
     }
 
-    BackHandler(onBack = onBackPressed)
+    BackHandler(onBack = navigateToInput)
 
-    //여기부터 추가
     Box(modifier = modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),

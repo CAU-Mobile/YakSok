@@ -8,7 +8,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.yaksok.R
+import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.example.yaksok.ui.routes.dialog.RouteDialog
 import com.example.yaksok.ui.routes.screen.GoogleMapScreen
 import com.example.yaksok.ui.routes.screen.RouteInputScreen
@@ -32,16 +32,17 @@ import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
 @Composable
 fun MapPage(
     routeViewModel: DirectionsViewModel,
+    placesViewmodel: PlacesViewModel,
     goToCreateYaksokPage: () -> Unit
 ) {
     val navController = rememberNavController()
-    var showDialog by remember { mutableStateOf(false) }
     var origin by remember { mutableStateOf("") }
     var destination by remember { mutableStateOf("") }
     var timeState by remember { mutableStateOf(0) }
     var selectedHourMinute by remember { mutableStateOf(Pair(0, 0)) }
 
     val routes by routeViewModel.routeSelectionText.collectAsState(initial = emptyList())
+    val showDialog by routeViewModel.showRouteDialog.collectAsState()
 
     Box(
         modifier = Modifier
@@ -54,13 +55,18 @@ fun MapPage(
                 RouteInputScreen(
                     origin = origin,
                     destination = destination,
+                    placeViewModel = placesViewmodel,
                     onOriginChange = { origin = it },
                     onDestinationChange = { destination = it },
                     onTimeChange = { currentTimeState, selectedHM ->
                         timeState = currentTimeState
                         selectedHourMinute = selectedHM
                     },
-                    onSearchClicked = { origin, destination, mode, timeSelectedState, selectedHourMinute ->
+                    onSearchClicked = { origin,
+                                        destination,
+                                        mode,
+                                        timeSelectedState,
+                                        selectedHourMinute ->
                         routeViewModel.setEverything(
                             origin,
                             destination,
@@ -68,14 +74,15 @@ fun MapPage(
                             timeSelectedState,
                             selectedHourMinute
                         )
-                        showDialog = true
                     }
                 )
             }
             composable("mapScreen") {
                 GoogleMapScreen(
                     viewModel = routeViewModel,
-                    onBackPressed = { navController.popBackStack() }
+                    navigateToInput = {
+                        navController.navigate("inputScreen")
+                    }
                 )
             }
         }
@@ -101,17 +108,11 @@ fun MapPage(
                 onIndexSelected = { index ->
                     routeViewModel.setSelectedRouteIndex(index)
                     routeViewModel.selectRoute(index)
-                    showDialog = false
+                    routeViewModel.closeRouteDialog()
                     navController.navigate("mapScreen")
                 },
-                onDismiss = { showDialog = false }
+                onDismiss = { routeViewModel.closeRouteDialog() }
             )
-        }
-    }
-
-    LaunchedEffect(routes) {
-        if (routes.isNotEmpty()) {
-            showDialog = true
         }
     }
 }

@@ -7,6 +7,7 @@ import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,15 +33,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yaksok.query.User
-import com.example.yaksok.ui.places.screen.PlaceSearchResultsDialog
+import com.example.yaksok.ui.places.dialog.PlaceSearchResultsDialog
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.flow.StateFlow
 import java.util.Calendar
 import java.util.TimeZone
@@ -65,13 +65,16 @@ fun CreateYaksokPage(
     val context = LocalContext.current
     var showCalender by remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
+
     val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
     var selectedDate by remember { mutableStateOf(calendar.timeInMillis) }
     var selectedHour by remember { mutableStateOf(calendar.get(Calendar.HOUR_OF_DAY)) }
     var selectedMinute by remember { mutableStateOf(calendar.get(Calendar.MINUTE)) }
 
-    var showDialog by remember { mutableStateOf(false) }
+    val showDialog by placeViewModel.showPlaceDialog.collectAsState()
     val placeSelectionText by placeViewModel.placeSelectionText.collectAsState()
+    val selectedPlace by placeViewModel.selectedPlace.collectAsState()
 
     fun showTimePickerDialog() {
         val timePickerDialog = TimePickerDialog(
@@ -87,12 +90,14 @@ fun CreateYaksokPage(
 
                 selectedDate = calendar.timeInMillis
                 timestamp = Timestamp(java.util.Date(selectedDate))
-                selectedDateTime = String.format("%04d-%02d-%02d %02d:%02d",
+                selectedDateTime = String.format(
+                    "%04d-%02d-%02d %02d:%02d",
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH) + 1,
                     calendar.get(Calendar.DAY_OF_MONTH),
                     selectedHour,
-                    selectedMinute)
+                    selectedMinute
+                )
             },
             selectedHour,
             selectedMinute,
@@ -132,7 +137,13 @@ fun CreateYaksokPage(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f), // 남은 공간을 채우도록 설정
+                .weight(1f) // 남은 공간을 채우도록 설정
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    focusManager.clearFocus()
+                },
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -183,7 +194,9 @@ fun CreateYaksokPage(
             // 나중에 지원님 코드 들어올때 반영해야 할곳 (장소 GeoPoint)
             TextField(
                 value = geoPoint,
-                onValueChange = { geoPoint = it },
+                onValueChange = {
+                    geoPoint = it
+                },
                 label = { Text("약속 장소") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -191,7 +204,6 @@ fun CreateYaksokPage(
                     .onFocusChanged { focusState ->
                         if (!focusState.isFocused && geoPoint.isNotBlank()) {
                             placeViewModel.searchPlaces(geoPoint)
-                            showDialog = true
                         }
                     },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -224,7 +236,7 @@ fun CreateYaksokPage(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 border = BorderStroke(2.dp, Color.Gray),
             ) {
-                Text(color = Color.Black, text= "시간 선택")
+                Text(color = Color.Black, text = "시간 선택")
             }
 
             // '약속 만들기' 버튼을 화면 하단에 배치
@@ -232,14 +244,17 @@ fun CreateYaksokPage(
                 onClick = {
                     showSuccessDialog = true
                     timestamp?.let {
-                        viewModel.addYaksok(
-                            name,
-                            details,
-                            geoPoint = GeoPoint(37.7749, -122.4194),
-                            time = it,
-                            friendList = selectedFriends
-                        )
+                        selectedPlace?.let { it1 ->
+                            viewModel.addYaksok(
+                                name,
+                                details,
+                                time = it,
+                                friendList = selectedFriends,
+                                selectedPlace = it1
+                            )
+                        }
                     }
+                    placeViewModel.closePlaceDialog()
                 },
                 modifier = Modifier
                     .padding(vertical = 16.dp), // 버튼 상하 간격 조정
@@ -251,19 +266,13 @@ fun CreateYaksokPage(
 
         }
 
-        LaunchedEffect(placeSelectionText) {
-            if (placeSelectionText.isNotEmpty()) {
-                showDialog = true
-            }
-        }
         if (showDialog) {
             PlaceSearchResultsDialog(
                 results = placeSelectionText,
-                onDismiss = { showDialog = false },
+                onDismiss = { placeViewModel.closePlaceDialog() },
                 onSelectPlace = { index ->
                     placeViewModel.selectPlace(index)
-                    showDialog = false
-//                    onNavigateToDetails()
+                    placeViewModel.closePlaceDialog()
                 }
             )
         }
@@ -271,10 +280,10 @@ fun CreateYaksokPage(
     }
     if (showCalender) {
         showDateTimePickerDialog()
-        showCalender=false
+        showCalender = false
     }
 
-    if(showSuccessDialog){
+    if (showSuccessDialog) {
         androidx.compose.material3.AlertDialog(
             onDismissRequest = { showSuccessDialog = false },
             title = { Text("약속 만들기") },

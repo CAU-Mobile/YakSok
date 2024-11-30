@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,16 +59,20 @@ fun RouteDialog(
                         selectedRouteIndex?.let { onIndexSelected(it) }
                         onDismiss()
                     },
-                    enabled = selectedRouteIndex != null
+                    enabled = selectedRouteIndex != null,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(74, 98, 138))
                 ) {
                     Text("선택완료")
                 }
             },
             dismissButton = {
-                Button(onClick = {
-                    onDismiss()
-                    viewmodel.refreshIndex()
-                }) {
+                Button(
+                    onClick = {
+                        onDismiss()
+                        viewmodel.refreshIndex()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(74, 98, 138))
+                ) {
                     Text("취소")
                 }
             }
