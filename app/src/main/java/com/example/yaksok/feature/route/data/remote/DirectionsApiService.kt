@@ -57,7 +57,7 @@ interface DirectionsApiService {
         @Query("mode") mode: String = "transit",
         @Query("alternatives") alternatives: Boolean = true,
         @Query("language") language: String = "ko",
-        @Query("key") apiKey: String = "AIzaSyBjB8ZQ4-Dds48-gF6GvxPYYmoo0hyJF5U"
+        @Query("key") apiKey: String = BuildConfig.MAPS_API_KEY
     ): DirectionsResponse
 
 }
