@@ -1,9 +1,11 @@
 package com.example.yaksok
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -16,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -39,8 +42,10 @@ import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.login.RegisterViewModel
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
+import com.example.yaksok.ui.routes.screen.GoogleMapScreen
 import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var placesViewModel: PlacesViewModel
@@ -56,6 +61,14 @@ class MainActivity : ComponentActivity() {
         routeViewModel =
             serviceLocator.directionsContainer.directionsViewModelFactory.create(DirectionsViewModel::class.java)
 
+        val loginViewModel: LoginViewModel by viewModels()
+
+        // StateFlow 관찰
+        lifecycleScope.launch {
+            loginViewModel.isLoggedIn.collect { isLoggedIn ->
+                Log.d("MainActivity", "로그인 상태 변경: $isLoggedIn")
+            }
+        }
         enableEdgeToEdge()
         setContent {
             YakSokTheme {
@@ -64,7 +77,8 @@ class MainActivity : ComponentActivity() {
                     "박수빈", "박예빈", "임결", "최지원", "이준우",
                     "박수빈", "박예빈", "임결", "최지원", "이준우"
                 ) //친구리스트 테스트용
-                val loginViewModel = LoginViewModel()
+//                val loginViewModel = LoginViewModel()
+
                 val registerViewModel = RegisterViewModel()
                 val AddFriendViewModel = AddFriendViewModel()
                 val YaksokViewModel = YaksokViewModel()
@@ -167,6 +181,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("savedPlaces") {
                             SavedPlacesPage()
+                        }
+                        composable("mapScreen") {
+                            GoogleMapScreen(
+                                viewModel = routeViewModel,
+                                navigateToInput = {
+                                    navController.navigate("inputScreen")
+                                }
+                            )
                         }
                     }
                 }
