@@ -5,14 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.yaksok.query.AppointmentQuery
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.query.FriendsQuery
-import com.example.yaksok.query.FriendsQuery.Companion.getFriendslist
+import com.example.yaksok.query.FriendsQueryCoroutine
 import com.example.yaksok.query.User
 import com.example.yaksok.query.UsersQuery
 import com.example.yaksok.query.UsersQuery.Companion.getUserIdWithCode
-import com.google.firebase.firestore.GeoPoint
+import com.example.yaksok.query.UsersQueryCoroutine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +23,7 @@ class AddFriendViewModel : ViewModel() {
     val isLoggedIn: StateFlow<Boolean> = _isAddSuccess
 
     private val _isAddError = MutableStateFlow<String?>("아이디가 존재하지 않습니다.") //아이디가 존재하지 않거나 등
-    val isAddError : StateFlow<String?> = _isAddError
+    val isAddError: StateFlow<String?> = _isAddError
 
 
     //친구 약속에 추가 항목
@@ -47,6 +46,19 @@ class AddFriendViewModel : ViewModel() {
     private val _selectedFriends = MutableStateFlow<List<User>>(emptyList())
     val selectedFriends: StateFlow<List<User>> = _selectedFriends.asStateFlow()
 
+    private val _myUserCode = MutableStateFlow("")
+    val myUserCode: StateFlow<String> = _myUserCode.asStateFlow()
+
+    fun getMyUserCode() {
+        viewModelScope.launch {
+            val currentUserId = AuthQuery.getCurrentUserId()
+            Log.d("ViewModel", "currentUserId: $currentUserId")
+            _myUserCode.value = currentUserId?.let {
+                UsersQueryCoroutine.getUserCodeWithId(it)
+            } ?: "Null Exception"
+        }
+    }
+
     fun addFriend(friendId: String) {
         viewModelScope.launch() {
             _isAddSuccess.value = false
@@ -60,12 +72,11 @@ class AddFriendViewModel : ViewModel() {
 
             try {
                 //친구목록 이미 있음 갖고와...
-                val result = FriendsQuery.getFriends(currentUserId)
-                val friendsList = result.getOrThrow()
-                if (friendsList.isEmpty()) {
+                val friendsList = FriendsQueryCoroutine.getFriends(currentUserId)
+                if (friendsList.isNullOrEmpty()) {
                     //친구목록이 없으면 Friends.createUser 해야함.
                     FriendsQuery.createUser(currentUserId) { success, message ->
-                        if (success){
+                        if (success) {
                             addFriendToUser(currentUserId, friendId)
                         } else {
                             _isAddError.value = message ?: "친구목록 생성 실패"
@@ -97,24 +108,26 @@ class AddFriendViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val friendIds = getFriendslist(userId)//친구 유저코드임
+                val friendIds = FriendsQueryCoroutine.getFriends(userId)//친구 유저코드임
                 val friendsInfo = mutableListOf<User>()//어쨌든 여기 더해줘야함.
 
                 Log.d("AddFriendViewModel", "FriendIds: $friendIds")
-                for (friendId in friendIds) { //친구아이디 목록만큼
-                    getUserIdWithCode(friendId) { success, userId, message ->
-                        if (success && userId != null) {
-                            UsersQuery.getUser(userId) { userSuccess, user, userMessage ->
-                                if (userSuccess && user != null) {
-                                    Log.d("AddFriendViewModel", "User fetched: ${user.name}")
-                                    friendsInfo.add(user) //FriendsInfo 리스트에 추가.
-                                    _friendList.value = friendsInfo
-                                } else{
-                                    _error.value = userMessage ?: "Failed to get user."
+                friendIds?.let {
+                    for (friendId in friendIds) { //친구아이디 목록만큼
+                        getUserIdWithCode(friendId) { success, userId, message ->
+                            if (success && userId != null) {
+                                UsersQuery.getUser(userId) { userSuccess, user, userMessage ->
+                                    if (userSuccess && user != null) {
+                                        Log.d("AddFriendViewModel", "User fetched: ${user.name}")
+                                        friendsInfo.add(user) //FriendsInfo 리스트에 추가.
+                                        _friendList.value = friendsInfo
+                                    } else {
+                                        _error.value = userMessage ?: "Failed to get user."
+                                    }
                                 }
+                            } else {
+                                _error.value = message
                             }
-                        } else {
-                            _error.value = message
                         }
                     }
                 }
@@ -132,6 +145,7 @@ class AddFriendViewModel : ViewModel() {
             this[friend.userCode] = true
         }
     }
+
     fun removeFriendFromYaksok(friend: User) {
         _selectedFriends.value -= friend
         _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
