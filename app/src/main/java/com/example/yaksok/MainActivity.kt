@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -45,7 +44,8 @@ import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.example.yaksok.ui.routes.screen.GoogleMapScreen
 import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
-import kotlinx.coroutines.launch
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     private lateinit var placesViewModel: PlacesViewModel
@@ -53,6 +53,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        try {
+            FirebaseApp.initializeApp(this)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "Firebase 초기화 실패...", e)
+        }
         val serviceLocator = (application as YakSokApplication).appContainer
 
         placesViewModel =
@@ -62,29 +68,33 @@ class MainActivity : ComponentActivity() {
             serviceLocator.directionsContainer.directionsViewModelFactory.create(DirectionsViewModel::class.java)
 
         val loginViewModel: LoginViewModel by viewModels()
+        val checkCurrentUser = FirebaseAuth.getInstance().currentUser
+        Log.d("MainActivity", "현재 로그인 상태: ${checkCurrentUser != null}")
+        val friendList = listOf(
+            "박수빈", "박예빈", "임결", "최지원", "이준우",
+            "박수빈", "박예빈", "임결", "최지원", "이준우"
+        ) //친구리스트 테스트용
+//                val loginViewModel = LoginViewModel()
 
-        // StateFlow 관찰
-        lifecycleScope.launch {
-            loginViewModel.isLoggedIn.collect { isLoggedIn ->
-                Log.d("MainActivity", "로그인 상태 변경: $isLoggedIn")
-            }
-        }
+        val registerViewModel = RegisterViewModel()
+        val addFriendViewModel = AddFriendViewModel()
+        val yaksokViewModel = YaksokViewModel()
+        val userId = AuthQuery.getCurrentUserId()
+        val distanceViewModel = DistanceViewModel()
+
         enableEdgeToEdge()
         setContent {
             YakSokTheme {
                 val navController = rememberNavController()
-                val friendList = listOf(
-                    "박수빈", "박예빈", "임결", "최지원", "이준우",
-                    "박수빈", "박예빈", "임결", "최지원", "이준우"
-                ) //친구리스트 테스트용
-//                val loginViewModel = LoginViewModel()
 
-                val registerViewModel = RegisterViewModel()
-                val AddFriendViewModel = AddFriendViewModel()
-                val YaksokViewModel = YaksokViewModel()
-                val userId = AuthQuery.getCurrentUserId()
-
-                val distanceViewModel = DistanceViewModel()
+                LaunchedEffect(Unit) {
+                    val currentUser = FirebaseAuth.getInstance().currentUser
+                    if (currentUser != null) {
+                        navController.navigate("map") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = Color.Transparent, // Scaffold 배경색 투명 설정
@@ -98,7 +108,6 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-
                         startDestination = "login",
                         modifier = Modifier.padding(innerPadding)
                     ) {
@@ -128,29 +137,29 @@ class MainActivity : ComponentActivity() {
                                 goToYaksokDetailPage = { appointmentId ->
                                     navController.navigate("yaksokDetail/$appointmentId")  // 화면 전환
                                 },
-                                viewModel = YaksokViewModel
+                                viewModel = yaksokViewModel
                             )
                         }
                         composable("createYaksok") {
                             CreateYaksokPage(
                                 goToAddFriendToYaksokPage = { navController.navigate("addFriendToYaksok") },
-                                viewModel = YaksokViewModel,
+                                viewModel = yaksokViewModel,
                                 placeViewModel = placesViewModel,
                                 goToManageYaksokPage = { navController.navigate("manageYaksok") },
-                                selectedFriends = AddFriendViewModel.selectedFriends
+                                selectedFriends = addFriendViewModel.selectedFriends
                             )
                         }
                         composable("addFriendToYaksok") {
                             if (userId != null) {
                                 AddFriendToYaksokPage(
                                     userId = userId,
-                                    viewModel = AddFriendViewModel
+                                    viewModel = addFriendViewModel
                                 )
                             }
                         }
                         composable("addFriends") {
                             AddFriendsPage(
-                                viewModel = AddFriendViewModel
+                                viewModel = addFriendViewModel
                             )
                         }
                         composable("yaksokDetail/{appointmentId}") { backStackEntry ->
@@ -171,7 +180,7 @@ class MainActivity : ComponentActivity() {
                                 appointment?.let {
                                     YaksokDetailPage(
                                         appointment = it,
-                                        viewModel = YaksokViewModel,
+                                        viewModel = yaksokViewModel,
                                         distanceViewModel = distanceViewModel
                                     )
                                 } ?: run {

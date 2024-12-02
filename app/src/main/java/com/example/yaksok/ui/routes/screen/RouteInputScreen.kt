@@ -188,7 +188,8 @@ fun RouteInputScreen(
                 )
             },
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211))
+            colors = ButtonDefaults.buttonColors(containerColor = Color(122, 178, 211)),
+            enabled = currentOrigin.isNotEmpty() && currentDestination.isNotEmpty()
         ) {
             Text("검색하기")
         }
