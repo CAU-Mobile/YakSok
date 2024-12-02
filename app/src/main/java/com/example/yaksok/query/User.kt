@@ -2,8 +2,10 @@ package com.example.yaksok.query
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.example.yaksok.query.UsersQuery.Companion.usersCollection
 import com.google.firebase.auth.UserInfo
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
@@ -13,7 +15,8 @@ import kotlin.coroutines.suspendCoroutine
 data class User(
     val userCode: String = "",
     val name: String = "",
-    val phoneNumber: String = ""
+    val phoneNumber: String = "",
+    val location: GeoPoint = GeoPoint(0.0, 0.0)
 )
 
 class UsersQuery {
@@ -156,6 +159,20 @@ class UsersQuery {
                         .addOnFailureListener { e ->
                             callBack(false, e.toString())
                         }
+                }
+                .addOnFailureListener {
+                    callBack(false, it.toString())
+                }
+        }
+
+        fun updateLocation(
+            userId: String,
+            location: GeoPoint,
+            callBack: (Boolean, String?) -> Unit
+        ) {
+            usersCollection.document(userId).update("location", location)
+                .addOnSuccessListener {
+                    callBack(true, "Update Success!")
                 }
                 .addOnFailureListener {
                     callBack(false, it.toString())
@@ -335,6 +352,23 @@ class UsersQueryCoroutine {
             return suspendCoroutine { continuation ->
                 UsersQuery.updateUser(
                     userId, name, phoneNumber
+                ) { isSuccess, log ->
+                    if (isSuccess) {
+                        continuation.resume(Unit)
+                    } else {
+                        continuation.resumeWithException(Exception(log))
+                    }
+                }
+            }
+        }
+
+        suspend fun updateLocation(
+            userId: String,
+            location: GeoPoint
+        ) {
+            return suspendCoroutine { continuation ->
+                UsersQuery.updateLocation(
+                    userId, location
                 ) { isSuccess, log ->
                     if (isSuccess) {
                         continuation.resume(Unit)
