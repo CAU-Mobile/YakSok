@@ -39,6 +39,7 @@ import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.login.RegisterViewModel
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
+import com.example.yaksok.ui.routes.screen.GoogleMapScreen
 import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
 import com.example.yaksok.ui.theme.YakSokTheme
 

@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -187,10 +188,16 @@ fun LoginPage(
         )
     }
 
-    isLoggedIn?.let { isSuccess ->
-        if (isSuccess) {
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn == true) {
             showSuccessDialog = true
-            viewModel.clearLoginState() // 상태 초기화
         }
     }
+
+//    isLoggedIn?.let { isSuccess ->
+//        if (isSuccess) {
+//            showSuccessDialog = true
+//           viewModel.clearLoginState()
+//        }
+//    }
 }

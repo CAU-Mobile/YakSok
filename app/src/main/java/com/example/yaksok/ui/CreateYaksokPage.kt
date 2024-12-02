@@ -206,7 +206,6 @@ fun CreateYaksokPage(
                             placeViewModel.searchPlaces(geoPoint)
                         }
                     },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color.Gray,
                     unfocusedBorderColor = Color(185, 229, 232),
