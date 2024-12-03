@@ -1,7 +1,6 @@
 package com.example.yaksok.feature.savePlace
 
 import androidx.lifecycle.ViewModel
-import com.example.yaksok.feature.place.presentation.model.PlaceModel
 import com.example.yaksok.feature.savePlace.model.SavedPlace
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -42,7 +41,6 @@ class SavePlaceViewModel @Inject constructor() : ViewModel() {
             websiteUri = webSiteUri,
             currentOpeningHours = currentOpeningHours
         )
-//        _savedPlaces.value += savedPlace
         firebaseDatabase.reference.child("savedPlaces").child(userId).push().setValue(savedPlace)
     }
 

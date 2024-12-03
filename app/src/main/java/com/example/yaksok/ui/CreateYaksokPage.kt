@@ -193,7 +193,6 @@ fun CreateYaksokPage(
                     cursorColor = Color.Gray
                 )
             )
-            // 나중에 지원님 코드 들어올때 반영해야 할곳 (장소 GeoPoint)
             TextField(
                 value = geoPoint,
                 onValueChange = {
