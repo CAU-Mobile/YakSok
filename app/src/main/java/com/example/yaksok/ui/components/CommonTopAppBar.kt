@@ -28,12 +28,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.yaksok.R
+import com.example.yaksok.ui.login.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar(
     navController: NavController,
-    goToAddFriendsPage: () -> Unit
+    goToAddFriendsPage: () -> Unit,
+    viewModel: LoginViewModel,
+    goToLoginPage : ()->Unit
 ) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.destination?.route
@@ -55,6 +58,14 @@ fun CommonTopAppBar(
                     Icon(
                         painter = painterResource(id = R.drawable.addfriend), // 친구 추가 아이콘
                         contentDescription = "Add Friend"
+                    )
+                }
+                IconButton(onClick = { goToLoginPage()
+                                        viewModel.logout()}
+                ){
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "LogOut"
                     )
                 }
             }

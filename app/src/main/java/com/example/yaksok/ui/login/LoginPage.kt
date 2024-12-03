@@ -174,20 +174,20 @@ fun LoginPage(
     }
 
     //로그인 확인 메세지 추가~
-    if (showSuccessDialog.value) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { viewModel.changeDialogState() },
-            title = { Text("로그인 완료") },
-            text = { Text("로그인 되었습니다.") },
-            confirmButton = {
-                Button(onClick = {
-                    viewModel.changeDialogState()
-                    // 로그인 성공 후 맵으로 이동
-                    goToMapPage()
-                }) {
-                    Text("확인")
-                }
-            }
-        )
-    }
+//    if (showSuccessDialog.value) {
+//        androidx.compose.material3.AlertDialog(
+//            onDismissRequest = { viewModel.changeDialogState() },
+//            title = { Text("로그인 완료") },
+//            text = { Text("로그인 되었습니다.") },
+//            confirmButton = {
+//                Button(onClick = {
+//                    viewModel.changeDialogState()
+//                    // 로그인 성공 후 맵으로 이동
+//                    goToMapPage()
+//                }) {
+//                    Text("확인")
+//                }
+//            }
+//        )
+//    }
 }

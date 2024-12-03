@@ -14,64 +14,68 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.yaksok.R
 
 @Composable
 fun CommonBottomAppBar(navController: NavController) {
     BottomAppBar (
         containerColor = Color.White,
-
         )
     {
+        val currentBackStackEntry = navController.currentBackStackEntryAsState()
+        val currentRoute = currentBackStackEntry.value?.destination?.route
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         )
-        { // 버튼을 가로로 배치하기 위해 Row 사용
-            Button(
-                onClick = {
-                    navController.navigate("savedPlaces")
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
-                ),
-                modifier = Modifier.size(100.dp) // 버튼 크기 설정
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.saved), // 버튼으로 사용할 이미지 리소스
-                    contentDescription = "savedPlacesBtn", // 이미지 설명
-                    modifier = Modifier.size(25.dp) // 이미지 크기 설정
-                )
-            }
-            Button(
-                onClick = {
-                    navController.navigate("map")
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
-                ),
-                modifier = Modifier.size(100.dp) // 버튼 크기 설정
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.home), // 버튼으로 사용할 이미지 리소스
-                    contentDescription = "homeBtn", // 이미지 설명
-                    modifier = Modifier.size(25.dp) // 이미지 크기 설정
-                )
-            }
-            Button(
-                onClick = {
-                    navController.navigate("manageYaksok")
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
-                ),
-                modifier = Modifier.size(100.dp) // 버튼 크기 설정
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.list), // 버튼으로 사용할 이미지 리소스
-                    contentDescription = "manageYaksokBtn", // 이미지 설명
-                    modifier = Modifier.size(25.dp) // 이미지 크기 설정
-                )
+        {
+            if (currentRoute != "login") {// 버튼을 가로로 배치하기 위해 Row 사용
+                Button(
+                    onClick = {
+                        navController.navigate("savedPlaces")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
+                    ),
+                    modifier = Modifier.size(100.dp) // 버튼 크기 설정
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.saved), // 버튼으로 사용할 이미지 리소스
+                        contentDescription = "savedPlacesBtn", // 이미지 설명
+                        modifier = Modifier.size(25.dp) // 이미지 크기 설정
+                    )
+                }
+                Button(
+                    onClick = {
+                        navController.navigate("map")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
+                    ),
+                    modifier = Modifier.size(100.dp) // 버튼 크기 설정
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.home), // 버튼으로 사용할 이미지 리소스
+                        contentDescription = "homeBtn", // 이미지 설명
+                        modifier = Modifier.size(25.dp) // 이미지 크기 설정
+                    )
+                }
+                Button(
+                    onClick = {
+                        navController.navigate("manageYaksok")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent // 버튼 배경을 투명하게 설정하여 이미지만 보이도록
+                    ),
+                    modifier = Modifier.size(100.dp) // 버튼 크기 설정
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.list), // 버튼으로 사용할 이미지 리소스
+                        contentDescription = "manageYaksokBtn", // 이미지 설명
+                        modifier = Modifier.size(25.dp) // 이미지 크기 설정
+                    )
+                }
             }
         }
     }
