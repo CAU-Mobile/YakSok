@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -202,22 +203,39 @@ fun YaksokDetailPage(
                     //아래를 살리면 지도가 안보여서 일단 주석처리했습니다
 //                        .clip(RoundedCornerShape(5.dp))
                 ) {
-                    Row {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+
+                    ) {
                         Text(
-                            text = appointment.placeName
+                            text = appointment.placeName,
+                            modifier = Modifier.weight(1f)
                         )
-                        Button(onClick = {
-                            savePlaceViewModel.savePlace(
-                                displayName = appointment.placeName,
-                                formattedAddress = appointment.placeAddress,
-                                placeLat = appointment.placeLat ?: 0.0,
-                                placeLng = appointment.placeLng ?: 0.0,
+                        Button(
+                            onClick = {
+                                savePlaceViewModel.savePlace(
+                                    displayName = appointment.placeName,
+                                    formattedAddress = appointment.placeAddress,
+                                    placeLat = appointment.placeLat ?: 0.0,
+                                    placeLng = appointment.placeLng ?: 0.0,
 //                                types = appointment.types,
-                                googleMapUri = appointment.placeGoogleUri,
-                                webSiteUri = appointment.placeWebsite,
-                                currentOpeningHours = appointment.placeHours ?: emptyList()
+                                    googleMapUri = appointment.placeGoogleUri,
+                                    webSiteUri = appointment.placeWebsite,
+                                    currentOpeningHours = appointment.placeHours ?: emptyList()
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(
+                                    122,
+                                    178,
+                                    211
+                                )
                             )
-                        }) {
+                        ) {
                             Text(text = "장소 저장")
                         }
                     }
