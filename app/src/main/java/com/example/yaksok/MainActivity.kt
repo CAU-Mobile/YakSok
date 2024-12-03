@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -227,47 +226,6 @@ class MainActivity : ComponentActivity() {
                                 Text("장소를 찾을 수 없습니다.", fontSize = 20.sp)
                             }
                         }
-
-//                        composable(
-//                            route = "placeDetail/{placeId}",
-//                            arguments = listOf(
-//                                navArgument("placeId") { type = NavType.StringType }
-//                            )
-//                        ) { backStackEntry ->
-//                            val placeId = backStackEntry.arguments?.getString("placeId")
-//                            val savedPlaces by savePlaceViewModel.savedPlaces.collectAsState()
-//                            val place = savedPlaces.find { it.id == placeId }
-//
-//                            if (place != null) {
-//                                PlaceDetailsScreen(place = place)
-//                            } else {
-//                                Text("장소를 찾을 수 없습니다.", fontSize = 20.sp)
-//                            }
-//                        }
-//                        //from here
-//                        composable("savedPlaces") {
-//                            SavedPlacesScreen(
-////                                viewModel = savePlaceViewModel,
-//                                onPlaceClick = { savedPlace ->
-//                                    navController.navigate("placeDetail/${savedPlace}")
-//                                }
-//                            )
-//                        }
-//                        // 장소 상세 정보 화면
-//                        composable(
-//                            route = "placeDetail/{place}",
-//                            arguments = listOf(
-//                                navArgument("placeId") { type = NavType.StringType }
-//                            )
-//                        ) { backStackEntry ->
-//                            val placeId = backStackEntry.arguments?.getString("placeId")
-//                            val place = savePlaceViewModel.savedPlaces.collectAsState().value
-//                                .find { it.id == placeId }
-//
-//                            place?.let {
-//                                PlaceDetailsScreen(place = it)
-//                            }
-//                        }
                         composable("mapScreen") {
                             GoogleMapScreen(
                                 viewModel = routeViewModel,
