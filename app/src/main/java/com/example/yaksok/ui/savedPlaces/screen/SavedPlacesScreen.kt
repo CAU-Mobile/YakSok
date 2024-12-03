@@ -29,7 +29,9 @@ fun SavedPlacesScreen(
     viewModel: SavePlaceViewModel,
     onPlaceClick: (SavedPlace) -> Unit
 ) {
+//    val savePlaceViewModel: SavePlaceViewModel = hiltViewModel()
     val savedPlaces by viewModel.savedPlaces.collectAsState()
+
 
     LazyColumn() {
         if (savedPlaces.isEmpty()) {

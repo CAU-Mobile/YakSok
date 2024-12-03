@@ -4,7 +4,8 @@ import com.example.yaksok.feature.place.presentation.model.OpeningHoursModel
 import java.util.UUID
 
 data class SavedPlace(
-    val id: String = UUID.randomUUID().toString(),
+    val userId: String = "",
+    val id: String = "",
     val displayName: String,
     val formattedAddress: String,
     val placeLat: Double,
@@ -13,5 +14,6 @@ data class SavedPlace(
 //    val rating: Float?,
     val googleMapsUri: String,
     val websiteUri: String?,
-    val currentOpeningHours: List<String>
+    val currentOpeningHours: List<String>,
+    val createdAd: Long = System.currentTimeMillis()
 )
