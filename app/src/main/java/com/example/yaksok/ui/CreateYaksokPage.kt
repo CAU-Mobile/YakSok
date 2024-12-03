@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yaksok.query.User
+import com.example.yaksok.ui.friend.AddFriendViewModel
 import com.example.yaksok.ui.places.dialog.PlaceSearchResultsDialog
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.google.firebase.Timestamp
@@ -51,6 +52,7 @@ import java.util.TimeZone
 @Composable
 fun CreateYaksokPage(
     viewModel: YaksokViewModel,
+    secondeviewModel : AddFriendViewModel,
     placeViewModel: PlacesViewModel,
     goToAddFriendToYaksokPage: () -> Unit,
     selectedFriends: StateFlow<List<User>>,
@@ -249,7 +251,7 @@ fun CreateYaksokPage(
                                 details,
                                 time = it,
                                 friendList = selectedFriends,
-                                selectedPlace = it1
+                                selectedPlace = it1,
                             )
                         }
                     }
@@ -290,6 +292,7 @@ fun CreateYaksokPage(
             confirmButton = {
                 Button(
                     onClick = {
+                        secondeviewModel.clearFriendFromYaksok()
                         showSuccessDialog = false
                         goToManageYaksokPage()
                     },

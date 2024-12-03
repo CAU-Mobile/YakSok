@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddFriendViewModel : ViewModel() {
+class AddFriendViewModel : ViewModel(
+) {
 
     private val _isAddSuccess = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isAddSuccess
@@ -150,6 +151,13 @@ class AddFriendViewModel : ViewModel() {
         _selectedFriends.value -= friend
         _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
             this[friend.userCode] = false
+        }
+    }
+
+    fun clearFriendFromYaksok(){
+        _selectedFriends.value = emptyList()
+        _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
+            keys.forEach { this[it] = false }
         }
     }
 
