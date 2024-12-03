@@ -19,6 +19,7 @@ mapsUtilsKtx = "5.1.1"
 navigationCompose = "2.8.3"
 playServicesAuth = "21.2.0"
 playServicesMaps = "19.0.0"
+playServicesMapsVersion = "17.0.0"
 retrofit = "2.11.0"
 roomRuntimeAndroid = "2.7.0-alpha11"
 roomKtx = "2.6.1"
@@ -58,6 +59,7 @@ androidx-room-runtime-android = { group = "androidx.room", name = "room-runtime-
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+play-services-maps-v1700 = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMapsVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }

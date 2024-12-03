@@ -153,4 +153,11 @@ class AddFriendViewModel : ViewModel() {
         }
     }
 
+    fun clearFriendFromYaksok() {
+        _selectedFriends.value = emptyList()
+        _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
+            keys.forEach { this[it] = false }
+        }
+    }
+
 }

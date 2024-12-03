@@ -112,7 +112,9 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         CommonTopAppBar(
                             navController = navController,
-                            goToAddFriendsPage = { navController.navigate("addFriends") }
+                            goToAddFriendsPage = { navController.navigate("addFriends") },
+                            viewModel = loginViewModel,
+                            goToLoginPage = { navController.navigate("login") }
                         )
                     }
                 ) { innerPadding ->
@@ -154,6 +156,7 @@ class MainActivity : ComponentActivity() {
                             CreateYaksokPage(
                                 goToAddFriendToYaksokPage = { navController.navigate("addFriendToYaksok") },
                                 viewModel = yaksokViewModel,
+                                secondeviewModel = addFriendViewModel,
                                 placeViewModel = placesViewModel,
                                 goToManageYaksokPage = { navController.navigate("manageYaksok") },
                                 selectedFriends = addFriendViewModel.selectedFriends
