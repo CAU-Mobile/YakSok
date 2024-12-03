@@ -42,7 +42,7 @@ class SavePlaceViewModel @Inject constructor() : ViewModel() {
             websiteUri = webSiteUri,
             currentOpeningHours = currentOpeningHours
         )
-        _savedPlaces.value += savedPlace
+//        _savedPlaces.value += savedPlace
         firebaseDatabase.reference.child("savedPlaces").child(userId).push().setValue(savedPlace)
     }
 

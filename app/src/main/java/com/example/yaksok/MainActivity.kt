@@ -51,7 +51,9 @@ import com.example.yaksok.ui.savedPlaces.screen.SavedPlacesScreen
 import com.example.yaksok.ui.theme.YakSokTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var placesViewModel: PlacesViewModel
     private lateinit var routeViewModel: DirectionsViewModel
@@ -197,7 +199,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("savedPlaces") {
                             SavedPlacesScreen(
-                                viewModel = savePlaceViewModel,
+//                                viewModel = savePlaceViewModel,
                                 onPlaceClick = { savedPlace ->
                                     navController.navigate("placeDetail/${savedPlace.id}")
                                 }
