@@ -47,35 +47,13 @@ fun LoginPage(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var loginMessage by remember { mutableStateOf("") }
-    var showSuccessDialog by remember { mutableStateOf(false) }
+    var showSuccessDialog = viewModel.showDialog.collectAsState()
 
     val isLoggedIn by viewModel.isLoggedIn.collectAsState()
-    //로그인 확인 메세지 추가~
-    if (showSuccessDialog) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showSuccessDialog = false },
-            title = { Text("로그인 완료") },
-            text = { Text("로그인 되었습니다.") },
-            confirmButton = {
-                Button(onClick = {
-                    showSuccessDialog = false
-                    // 로그인 성공 후 맵으로 이동
-                    goToMapPage()
-                }) {
-                    Text("확인")
-                }
-            }
-        )
-    }
-    LaunchedEffect(Unit) {
-        if (isLoggedIn == true) {
-            goToMapPage()
-        }
-    }
 
     LaunchedEffect(isLoggedIn) {
-        if (isLoggedIn == true && !showSuccessDialog) {
-            showSuccessDialog = true
+        if (isLoggedIn == true) {
+            onLoginSuccess()
         }
     }
 
@@ -106,7 +84,7 @@ fun LoginPage(
                     text = "약속어때",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(58,58,58) // 색상은 이미지 참고하여 설정
+                    color = Color(58, 58, 58) // 색상은 이미지 참고하여 설정
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -121,17 +99,18 @@ fun LoginPage(
                 // 이메일 입력 필드
                 TextField(
                     value = email,
-                    onValueChange = {email=it},
+                    onValueChange = { email = it },
                     placeholder = {
                         Text(
                             text = "이메일",
                             color = Color.LightGray,
-                        ) },
-                    keyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Email),
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
-                        containerColor = Color(240, 240,240),
+                        containerColor = Color(240, 240, 240),
                         focusedIndicatorColor = Color.Transparent, // 포커스된 상태의 인디케이터 색상 제거
                         unfocusedIndicatorColor = Color.Transparent // 포커스되지 않은 상태의 인디케이터 색상 제거
                     )
@@ -142,7 +121,7 @@ fun LoginPage(
                 // 비밀번호 입력 필드
                 TextField(
                     value = password,
-                    onValueChange = {password=it},
+                    onValueChange = { password = it },
                     placeholder = {
                         Text(
                             text = "비밀번호",
@@ -153,7 +132,7 @@ fun LoginPage(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors( // 플레이스홀더 텍스트 색상
-                        containerColor = Color(240, 240,240),
+                        containerColor = Color(240, 240, 240),
                         focusedIndicatorColor = Color.Transparent, // 포커스된 상태의 인디케이터 색상 제거
                         unfocusedIndicatorColor = Color.Transparent // 포커스되지 않은 상태의 인디케이터 색상 제거
                     )
@@ -194,10 +173,21 @@ fun LoginPage(
         }
     }
 
-//    isLoggedIn?.let { isSuccess ->
-//        if (isSuccess) {
-//            showSuccessDialog = true
-//           viewModel.clearLoginState()
-//        }
-//    }
+    //로그인 확인 메세지 추가~
+    if (showSuccessDialog.value) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { viewModel.changeDialogState() },
+            title = { Text("로그인 완료") },
+            text = { Text("로그인 되었습니다.") },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.changeDialogState()
+                    // 로그인 성공 후 맵으로 이동
+                    goToMapPage()
+                }) {
+                    Text("확인")
+                }
+            }
+        )
+    }
 }
