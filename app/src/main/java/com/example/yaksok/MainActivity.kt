@@ -1,5 +1,6 @@
 package com.example.yaksok
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -18,16 +19,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.yaksok.feature.savePlace.SavePlaceViewModel
+import com.example.yaksok.feature.savePlace.model.SavedPlace
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
-import com.example.yaksok.ui.SavedPlacesPage
 import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.YaksokViewModel
 import com.example.yaksok.ui.components.CommonBottomAppBar
@@ -40,13 +44,18 @@ import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.login.RegisterViewModel
+import com.example.yaksok.ui.places.screen.PlaceDetailsScreen
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.example.yaksok.ui.routes.screen.GoogleMapScreen
 import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
+import com.example.yaksok.ui.savedPlaces.screen.SavedPlacesScreen
 import com.example.yaksok.ui.theme.YakSokTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var placesViewModel: PlacesViewModel
     private lateinit var routeViewModel: DirectionsViewModel
@@ -81,6 +90,7 @@ class MainActivity : ComponentActivity() {
         val yaksokViewModel = YaksokViewModel()
         val userId = AuthQuery.getCurrentUserId()
         val distanceViewModel = DistanceViewModel()
+        val savePlaceViewModel = SavePlaceViewModel()
 
         enableEdgeToEdge()
         setContent {
@@ -181,7 +191,8 @@ class MainActivity : ComponentActivity() {
                                     YaksokDetailPage(
                                         appointment = it,
                                         viewModel = yaksokViewModel,
-                                        distanceViewModel = distanceViewModel
+                                        distanceViewModel = distanceViewModel,
+                                        savePlaceViewModel = savePlaceViewModel
                                     )
                                 } ?: run {
                                     Text("Appointment not found", fontSize = 20.sp)
@@ -189,7 +200,31 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable("savedPlaces") {
-                            SavedPlacesPage()
+                            SavedPlacesScreen(
+                                onPlaceClick = { savedPlace ->
+                                    // 전체 SavedPlace 객체를 문자열로 변환하여 전달
+                                    val placeJson = Uri.encode(Gson().toJson(savedPlace))
+                                    navController.navigate("placeDetail/$placeJson")
+                                }
+                            )
+                        }
+                        composable(
+                            route = "placeDetail/{placeJson}",
+                            arguments = listOf(
+                                navArgument("placeJson") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val placeJson = backStackEntry.arguments?.getString("placeJson")
+                            // JSON 문자열을 다시 SavedPlace 객체로 변환
+                            val place = placeJson?.let {
+                                Gson().fromJson(Uri.decode(it), SavedPlace::class.java)
+                            }
+
+                            if (place != null) {
+                                PlaceDetailsScreen(place = place)
+                            } else {
+                                Text("장소를 찾을 수 없습니다.", fontSize = 20.sp)
+                            }
                         }
                         composable("mapScreen") {
                             GoogleMapScreen(

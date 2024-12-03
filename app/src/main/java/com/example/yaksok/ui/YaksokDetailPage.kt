@@ -23,6 +23,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -43,6 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import com.example.yaksok.R
+import com.example.yaksok.feature.place.presentation.model.LatLngModel
+import com.example.yaksok.feature.place.presentation.model.PlaceModel
+import com.example.yaksok.feature.savePlace.SavePlaceViewModel
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.ui.distance.viewModel.DistanceViewModel
 import com.google.android.gms.location.LocationServices
@@ -61,7 +66,8 @@ import java.time.format.DateTimeFormatter
 fun YaksokDetailPage(
     appointment: Appointment,
     viewModel: YaksokViewModel,
-    distanceViewModel: DistanceViewModel
+    distanceViewModel: DistanceViewModel,
+    savePlaceViewModel: SavePlaceViewModel
 ) {
     val context = LocalContext.current
     val fusedLocationClient = remember {
@@ -197,9 +203,42 @@ fun YaksokDetailPage(
                     //아래를 살리면 지도가 안보여서 일단 주석처리했습니다
 //                        .clip(RoundedCornerShape(5.dp))
                 ) {
-                    Text(
-                        text = appointment.placeName
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+
+                    ) {
+                        Text(
+                            text = appointment.placeName,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Button(
+                            onClick = {
+                                savePlaceViewModel.savePlace(
+                                    displayName = appointment.placeName,
+                                    formattedAddress = appointment.placeAddress,
+                                    placeLat = appointment.placeLat ?: 0.0,
+                                    placeLng = appointment.placeLng ?: 0.0,
+//                                types = appointment.types,
+                                    googleMapUri = appointment.placeGoogleUri,
+                                    webSiteUri = appointment.placeWebsite,
+                                    currentOpeningHours = appointment.placeHours ?: emptyList()
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(
+                                    122,
+                                    178,
+                                    211
+                                )
+                            )
+                        ) {
+                            Text(text = "장소 저장")
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
 
                     if (appointment.placeLat != null && appointment.placeLng != null) {

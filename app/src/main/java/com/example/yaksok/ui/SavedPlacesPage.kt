@@ -49,8 +49,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SavedPlacesPage() {
-    Text("savedplacespage")
-}
+//@OptIn(ExperimentalMaterial3Api::class)
+//@Composable
+//fun SavedPlacesPage() {
+//    Text("savedplacespage")
+//}
