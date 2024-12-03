@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,16 +19,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.yaksok.feature.savePlace.SavePlaceViewModel
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.ui.CreateYaksokPage
 import com.example.yaksok.ui.ManageYaksokPage
 import com.example.yaksok.ui.MapPage
-import com.example.yaksok.ui.SavedPlacesPage
 import com.example.yaksok.ui.YaksokDetailPage
 import com.example.yaksok.ui.YaksokViewModel
 import com.example.yaksok.ui.components.CommonBottomAppBar
@@ -40,9 +43,11 @@ import com.example.yaksok.ui.login.LoginPage
 import com.example.yaksok.ui.login.LoginViewModel
 import com.example.yaksok.ui.login.RegisterPage
 import com.example.yaksok.ui.login.RegisterViewModel
+import com.example.yaksok.ui.places.screen.PlaceDetailsScreen
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.example.yaksok.ui.routes.screen.GoogleMapScreen
 import com.example.yaksok.ui.routes.viewModel.DirectionsViewModel
+import com.example.yaksok.ui.savedPlaces.screen.SavedPlacesScreen
 import com.example.yaksok.ui.theme.YakSokTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -81,6 +86,7 @@ class MainActivity : ComponentActivity() {
         val yaksokViewModel = YaksokViewModel()
         val userId = AuthQuery.getCurrentUserId()
         val distanceViewModel = DistanceViewModel()
+        val savePlaceViewModel = SavePlaceViewModel()
 
         enableEdgeToEdge()
         setContent {
@@ -181,7 +187,8 @@ class MainActivity : ComponentActivity() {
                                     YaksokDetailPage(
                                         appointment = it,
                                         viewModel = yaksokViewModel,
-                                        distanceViewModel = distanceViewModel
+                                        distanceViewModel = distanceViewModel,
+                                        savePlaceViewModel = savePlaceViewModel
                                     )
                                 } ?: run {
                                     Text("Appointment not found", fontSize = 20.sp)
@@ -189,7 +196,27 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable("savedPlaces") {
-                            SavedPlacesPage()
+                            SavedPlacesScreen(
+                                viewModel = savePlaceViewModel,
+                                onPlaceClick = { savedPlace ->
+                                    navController.navigate("placeDetail/${savedPlace.id}")
+                                }
+                            )
+                        }
+                        // 장소 상세 정보 화면
+                        composable(
+                            route = "placeDetail/{placeId}",
+                            arguments = listOf(
+                                navArgument("placeId") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val placeId = backStackEntry.arguments?.getString("placeId")
+                            val place = savePlaceViewModel.savedPlaces.collectAsState().value
+                                .find { it.id == placeId }
+
+                            place?.let {
+                                PlaceDetailsScreen(place = it)
+                            }
                         }
                         composable("mapScreen") {
                             GoogleMapScreen(
