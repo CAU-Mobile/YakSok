@@ -1,5 +1,6 @@
 package com.example.yaksok
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -25,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.yaksok.feature.savePlace.SavePlaceViewModel
+import com.example.yaksok.feature.savePlace.model.SavedPlace
 import com.example.yaksok.query.Appointment
 import com.example.yaksok.query.AppointmentQueryCoroutine
 import com.example.yaksok.query.AuthQuery
@@ -51,6 +53,7 @@ import com.example.yaksok.ui.savedPlaces.screen.SavedPlacesScreen
 import com.example.yaksok.ui.theme.YakSokTheme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -199,27 +202,72 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("savedPlaces") {
                             SavedPlacesScreen(
-//                                viewModel = savePlaceViewModel,
                                 onPlaceClick = { savedPlace ->
-                                    navController.navigate("placeDetail/${savedPlace.id}")
+                                    // 전체 SavedPlace 객체를 문자열로 변환하여 전달
+                                    val placeJson = Uri.encode(Gson().toJson(savedPlace))
+                                    navController.navigate("placeDetail/$placeJson")
                                 }
                             )
                         }
-                        // 장소 상세 정보 화면
                         composable(
-                            route = "placeDetail/{placeId}",
+                            route = "placeDetail/{placeJson}",
                             arguments = listOf(
-                                navArgument("placeId") { type = NavType.StringType }
+                                navArgument("placeJson") { type = NavType.StringType }
                             )
                         ) { backStackEntry ->
-                            val placeId = backStackEntry.arguments?.getString("placeId")
-                            val place = savePlaceViewModel.savedPlaces.collectAsState().value
-                                .find { it.id == placeId }
+                            val placeJson = backStackEntry.arguments?.getString("placeJson")
+                            // JSON 문자열을 다시 SavedPlace 객체로 변환
+                            val place = placeJson?.let {
+                                Gson().fromJson(Uri.decode(it), SavedPlace::class.java)
+                            }
 
-                            place?.let {
-                                PlaceDetailsScreen(place = it)
+                            if (place != null) {
+                                PlaceDetailsScreen(place = place)
+                            } else {
+                                Text("장소를 찾을 수 없습니다.", fontSize = 20.sp)
                             }
                         }
+
+//                        composable(
+//                            route = "placeDetail/{placeId}",
+//                            arguments = listOf(
+//                                navArgument("placeId") { type = NavType.StringType }
+//                            )
+//                        ) { backStackEntry ->
+//                            val placeId = backStackEntry.arguments?.getString("placeId")
+//                            val savedPlaces by savePlaceViewModel.savedPlaces.collectAsState()
+//                            val place = savedPlaces.find { it.id == placeId }
+//
+//                            if (place != null) {
+//                                PlaceDetailsScreen(place = place)
+//                            } else {
+//                                Text("장소를 찾을 수 없습니다.", fontSize = 20.sp)
+//                            }
+//                        }
+//                        //from here
+//                        composable("savedPlaces") {
+//                            SavedPlacesScreen(
+////                                viewModel = savePlaceViewModel,
+//                                onPlaceClick = { savedPlace ->
+//                                    navController.navigate("placeDetail/${savedPlace}")
+//                                }
+//                            )
+//                        }
+//                        // 장소 상세 정보 화면
+//                        composable(
+//                            route = "placeDetail/{place}",
+//                            arguments = listOf(
+//                                navArgument("placeId") { type = NavType.StringType }
+//                            )
+//                        ) { backStackEntry ->
+//                            val placeId = backStackEntry.arguments?.getString("placeId")
+//                            val place = savePlaceViewModel.savedPlaces.collectAsState().value
+//                                .find { it.id == placeId }
+//
+//                            place?.let {
+//                                PlaceDetailsScreen(place = it)
+//                            }
+//                        }
                         composable("mapScreen") {
                             GoogleMapScreen(
                                 viewModel = routeViewModel,
