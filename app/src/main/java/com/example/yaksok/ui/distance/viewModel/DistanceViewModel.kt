@@ -2,45 +2,34 @@ package com.example.yaksok.ui.distance.viewModel
 
 import android.location.Location
 import androidx.lifecycle.ViewModel
+import com.example.yaksok.query.Utilities
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class DistanceViewModel : ViewModel() {
-    private val _currentDistance = MutableStateFlow<Double?>(null)
-    val currentDistance: StateFlow<Double?> = _currentDistance
+     var appointmentLocation: Location? = null
 
-    private var _othersDistance = 0.0
-    val othersDistance: Double get() = _othersDistance
-
-    fun calculateDistance(
-        currentLocation: Location,
-        destinationLat: Double,
-        destinationLng: Double
-    ) {
-        val results = FloatArray(1)
-        Location.distanceBetween(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            destinationLat,
-            destinationLng,
-            results
-        )
-        _currentDistance.value = results[0].toDouble()
+    private var _distanceMap: HashMap<String, Double> = HashMap()
+    fun getDistanceWithUserId(userId: String): Double {
+        return _distanceMap[userId] ?: 0.0
     }
 
-    fun calculateOthersDistance(
-        currentLocation: Location,
-        destinationLat: Double,
-        destinationLng: Double
+    private fun addDistance(userId: String, distance: Double) {
+        _distanceMap[userId] = distance
+    }
+
+    fun updateDistance(
+        userId: String,
+        location: Location
     ) {
-        val results = FloatArray(1)
-        Location.distanceBetween(
-            currentLocation.latitude,
-            currentLocation.longitude,
-            destinationLat,
-            destinationLng,
-            results
-        )
-        _othersDistance = results[0].toDouble()
+        appointmentLocation?.let {
+            val result = Utilities.getDistance(
+                appointmentLocation!!.latitude,
+                appointmentLocation!!.longitude,
+                location.latitude,
+                location.longitude)
+            addDistance(userId, result)
+        }
     }
 }

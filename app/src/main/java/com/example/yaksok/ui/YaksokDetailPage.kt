@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import com.example.yaksok.R
 import com.example.yaksok.query.Appointment
+import com.example.yaksok.query.UsersQuery
+import com.example.yaksok.query.UsersQueryCoroutine
 import com.example.yaksok.ui.distance.viewModel.DistanceViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
@@ -52,7 +54,10 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -85,10 +90,9 @@ fun YaksokDetailPage(
                             "yaksok 현재위치",
                             "권한 승인 후 최초 위치: 위도: ${it.latitude}, 경도: ${it.longitude}"
                         )
-                        appointment.placeLat?.let { lat ->
-                            appointment.placeLng?.let { lng ->
-                                distanceViewModel.calculateDistance(location, lat, lng)
-                            }
+                        distanceViewModel.appointmentLocation = Location("").apply {
+                            latitude = appointment.geoPoint.latitude
+                            longitude = appointment.geoPoint.longitude
                         }
                     }
                 }
@@ -108,38 +112,51 @@ fun YaksokDetailPage(
     }
 
     LaunchedEffect(appointment.memberIds) {
-        appointment.memberIds.forEach { memberId ->
-            viewModel.loadFriendNumber(memberId)
-            viewModel.loadFriendName(memberId)
+        distanceViewModel.appointmentLocation?.let {
+            appointment.memberIds.forEach { memberId ->
+                viewModel.loadFriendNumber(memberId)
+                viewModel.loadFriendName(memberId)
+                val user = UsersQueryCoroutine.getUserWithCode(memberId)
+                val thisLocation = Location("").apply {
+                    user?.let {
+                        latitude = user.location.latitude
+                        longitude = user.location.longitude
+                    }
+                }
+                distanceViewModel.updateDistance(
+                    memberId,
+                    thisLocation
+                )
+            }
         }
     }
 
     // 위치 업데이트 및 거리 계산하는 부분
     LaunchedEffect(Unit) {
         while (true) {
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    location?.let {
-                        Log.d("약속현재위치", "위도: ${it.latitude}, 경도: ${it.longitude}")
-                        appointment.placeLat?.let { lat ->
-                            appointment.placeLng?.let { lng ->
-                                distanceViewModel.calculateDistance(location, lat, lng)
-                            }
+            distanceViewModel.appointmentLocation?.let {
+                appointment.memberIds.forEach { memberId ->
+                    viewModel.loadFriendNumber(memberId)
+                    viewModel.loadFriendName(memberId)
+                    val user = UsersQueryCoroutine.getUserWithCode(memberId)
+                    val thisLocation = Location("").apply {
+                        user?.let {
+                            latitude = user.location.latitude
+                            longitude = user.location.longitude
                         }
                     }
+                    distanceViewModel.updateDistance(
+                        memberId,
+                        thisLocation
+                    )
                 }
             }
-            delay(60000) // 1분간격
+            delay(10000) // 1분간격
         }
     }
 
     val friendNumbers by viewModel.friendNumbers.observeAsState(emptyMap())
     val friendNames by viewModel.friendNames.observeAsState(emptyMap())
-    val currentDistance by distanceViewModel.currentDistance.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -252,7 +269,6 @@ fun YaksokDetailPage(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        var isFirst = true
         items(appointment.memberIds) { memberId ->
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -283,66 +299,28 @@ fun YaksokDetailPage(
                         color = Color(58, 58, 58)
                     )
                 }
-                if (isFirst) {
-                    currentDistance?.let { distanceValue ->
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "남은 거리: ${String.format("%.1f", distanceValue)}m",
-                                fontSize = 12.sp,
-                                color = Color.Gray
-                            )
-                            if (distanceValue <= 100) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "도착 직전",
-                                    fontSize = 12.sp,
-                                    color = Color(122, 178, 211),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    //TODO 여기에서 다른 사람들 위치 받아와야 합니다
-                    val thisLocation = Location("").apply {
-                        //TODO 여기의 37~, 126~ 을 다른 사람들의 위치로 바꾸면 됩니다
-                        latitude = 37.5045563
-                        longitude = 126.9569379
-                    }
-                    distanceViewModel.calculateOthersDistance(
-                        thisLocation,
-                        destinationLat = appointment.placeLat ?: 37.5045563,
-                        destinationLng = appointment.placeLng ?: 126.9569379
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val distanceValue = distanceViewModel.getDistanceWithUserId(memberId)
+                    Text(
+                        text = "남은 거리: ${String.format("%.1f", distanceValue)}km",
+                        fontSize = 12.sp,
+                        color = Color.Gray
                     )
-                    val thisDistance = distanceViewModel.othersDistance
-                    thisDistance.let { distanceValue ->
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "남은 거리: ${String.format("%.1f", distanceValue)}m",
-                                fontSize = 12.sp,
-                                color = Color.Gray
-                            )
-                            if (distanceValue <= 100) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "도착 직전",
-                                    fontSize = 12.sp,
-                                    color = Color(122, 178, 211),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
+                    if (distanceValue <= 100) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "도착 직전",
+                            fontSize = 12.sp,
+                            color = Color(122, 178, 211),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
             Spacer(modifier = Modifier.width(12.dp))
-            isFirst = false
         }
     }
 }
