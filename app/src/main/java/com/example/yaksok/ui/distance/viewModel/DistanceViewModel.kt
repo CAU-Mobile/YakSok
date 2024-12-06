@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.StateFlow
 class DistanceViewModel : ViewModel() {
      var appointmentLocation: Location? = null
 
-    private var _distanceMap: HashMap<String, Double> = HashMap()
-    fun getDistanceWithUserId(userId: String): Double {
-        return _distanceMap[userId] ?: 0.0
-    }
+    private var _distanceMap = MutableStateFlow(HashMap<String, Double>(HashMap()))
+    val distanceMap: StateFlow<Map<String, Double>> = _distanceMap
 
     private fun addDistance(userId: String, distance: Double) {
-        _distanceMap[userId] = distance
+        val updatedMap = HashMap(_distanceMap.value)
+        updatedMap[userId] = distance
+        _distanceMap.value = updatedMap
     }
 
     fun updateDistance(

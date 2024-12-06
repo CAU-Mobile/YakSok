@@ -96,10 +96,7 @@ fun YaksokDetailPage(
                             "yaksok 현재위치",
                             "권한 승인 후 최초 위치: 위도: ${it.latitude}, 경도: ${it.longitude}"
                         )
-                        distanceViewModel.appointmentLocation = Location("").apply {
-                            latitude = appointment.geoPoint.latitude
-                            longitude = appointment.geoPoint.longitude
-                        }
+
                     }
                 }
             }
@@ -139,6 +136,10 @@ fun YaksokDetailPage(
 
     // 위치 업데이트 및 거리 계산하는 부분
     LaunchedEffect(Unit) {
+        distanceViewModel.appointmentLocation = Location("").apply {
+            latitude = appointment.geoPoint.latitude
+            longitude = appointment.geoPoint.longitude
+        }
         while (true) {
             distanceViewModel.appointmentLocation?.let {
                 appointment.memberIds.forEach { memberId ->
@@ -157,12 +158,13 @@ fun YaksokDetailPage(
                     )
                 }
             }
-            delay(10000) // 1분간격
+            delay(1000)
         }
     }
 
     val friendNumbers by viewModel.friendNumbers.observeAsState(emptyMap())
     val friendNames by viewModel.friendNames.observeAsState(emptyMap())
+    val distances by distanceViewModel.distanceMap.collectAsState()
 
     LazyColumn(
         modifier = Modifier
@@ -342,13 +344,12 @@ fun YaksokDetailPage(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val distanceValue = distanceViewModel.getDistanceWithUserId(memberId)
                     Text(
-                        text = "남은 거리: ${String.format("%.1f", distanceValue)}km",
+                        text = "남은 거리: ${"%.2f".format(distances[memberId])}km",
                         fontSize = 12.sp,
                         color = Color.Gray
                     )
-                    if (distanceValue <= 100) {
+                    if ((distances[memberId] ?: 0.0) <= 0.1) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "도착 직전",
