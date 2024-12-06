@@ -64,8 +64,8 @@ class LoginViewModel : ViewModel() {
 //        _loginError.value = null.toString()
 //    }
 
-//    fun logout() { //아직은 쓸일없는듯
-//        AuthQuery.logout()
-//        _isLoggedIn.value = false
-//    }
+    fun logout() {
+        AuthQuery.logout()
+        _isLoggedIn.value = false
+    }
 }

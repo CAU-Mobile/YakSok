@@ -8,8 +8,6 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
@@ -18,7 +16,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.example.yaksok.ui.places.viewModel.PlacesViewModel
+import com.example.yaksok.feature.savePlace.model.SavedPlace
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -27,41 +25,39 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun PlaceDetailsScreen(viewModel: PlacesViewModel) {
-    val selectedPlace by viewModel.selectedPlace.collectAsState()
+fun PlaceDetailsScreen(
+    place: SavedPlace
+) {
     val uriHandler = LocalUriHandler.current
 
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        selectedPlace?.let { place ->
+        place.let { place ->
             GoogleMap(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp),
                 cameraPositionState = rememberCameraPositionState {
                     position = CameraPosition.fromLatLngZoom(
-                        LatLng(place.location.latitude, place.location.longitude),
+                        LatLng(place.placeLat, place.placeLng),
                         15f
                     )
                 }) {
                 Marker(
                     state = MarkerState(
-                        position = LatLng(place.location.latitude, place.location.longitude)
+                        position = LatLng(place.placeLat, place.placeLng)
                     ),
-                    title = place.displayName.text
+                    title = place.displayName
                 )
             }
         }
 
-        selectedPlace?.let { place ->
+        place.let { place ->
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(place.displayName.text, style = MaterialTheme.typography.displaySmall)
+                Text(place.displayName, style = MaterialTheme.typography.displaySmall)
                 Text("\n")
                 Text("주소: ${place.formattedAddress}\n")
-                if (place.rating != null) {
-                    Text("평점 : ${place.rating}\n")
-                }
                 ClickableText(
                     text = buildAnnotatedString {
                         append("구글 맵 : ")
@@ -100,9 +96,9 @@ fun PlaceDetailsScreen(viewModel: PlacesViewModel) {
                         }
                     )
                 }
-                if (!place.currentOpeningHours?.weekdayDescriptions.isNullOrEmpty()) {
+                if (place.currentOpeningHours.isNotEmpty()) {
                     Text("\n영업시간")
-                    place.currentOpeningHours?.weekdayDescriptions?.forEach {
+                    place.currentOpeningHours.forEach {
                         Text(it)
                     }
                 }

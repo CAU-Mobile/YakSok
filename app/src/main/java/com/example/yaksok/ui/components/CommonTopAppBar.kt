@@ -1,24 +1,14 @@
 package com.example.yaksok.ui.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,12 +18,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.yaksok.R
+import com.example.yaksok.ui.login.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommonTopAppBar(
     navController: NavController,
-    goToAddFriendsPage: () -> Unit
+    goToAddFriendsPage: () -> Unit,
+    viewModel: LoginViewModel,
+    goToLoginPage: () -> Unit
 ) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.destination?.route
@@ -55,6 +48,16 @@ fun CommonTopAppBar(
                     Icon(
                         painter = painterResource(id = R.drawable.addfriend), // 친구 추가 아이콘
                         contentDescription = "Add Friend"
+                    )
+                }
+                IconButton(onClick = {
+                    goToLoginPage()
+                    viewModel.logout()
+                }
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = "LogOut"
                     )
                 }
             }

@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.yaksok.query.User
+import com.example.yaksok.ui.friend.AddFriendViewModel
 import com.example.yaksok.ui.places.dialog.PlaceSearchResultsDialog
 import com.example.yaksok.ui.places.viewModel.PlacesViewModel
 import com.google.firebase.Timestamp
@@ -51,6 +52,7 @@ import java.util.TimeZone
 @Composable
 fun CreateYaksokPage(
     viewModel: YaksokViewModel,
+    secondeviewModel: AddFriendViewModel,
     placeViewModel: PlacesViewModel,
     goToAddFriendToYaksokPage: () -> Unit,
     selectedFriends: StateFlow<List<User>>,
@@ -191,7 +193,6 @@ fun CreateYaksokPage(
                     cursorColor = Color.Gray
                 )
             )
-            // 나중에 지원님 코드 들어올때 반영해야 할곳 (장소 GeoPoint)
             TextField(
                 value = geoPoint,
                 onValueChange = {
@@ -206,7 +207,6 @@ fun CreateYaksokPage(
                             placeViewModel.searchPlaces(geoPoint)
                         }
                     },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color.Gray,
                     unfocusedBorderColor = Color(185, 229, 232),
@@ -250,7 +250,7 @@ fun CreateYaksokPage(
                                 details,
                                 time = it,
                                 friendList = selectedFriends,
-                                selectedPlace = it1
+                                selectedPlace = it1,
                             )
                         }
                     }
@@ -291,6 +291,7 @@ fun CreateYaksokPage(
             confirmButton = {
                 Button(
                     onClick = {
+                        secondeviewModel.clearFriendFromYaksok()
                         showSuccessDialog = false
                         goToManageYaksokPage()
                     },
