@@ -41,9 +41,16 @@ fun AddFriendToYaksokPage(
     viewModel: AddFriendViewModel= viewModel()
 ) {
 
+    LaunchedEffect(Unit) {
+        viewModel.getMyUserCode()
+    }
+
     LaunchedEffect(userId) {
+        viewModel.clearFriendList()
+        viewModel.getMyUserCode()
         viewModel.loadFriends(userId)
     }
+
     val friendList by viewModel.friendList.collectAsState(emptyList())
     val loading = viewModel.loading
     val error = viewModel.error

@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.yaksok.query.AuthQuery
 import com.example.yaksok.query.FriendsQuery
 import com.example.yaksok.query.FriendsQueryCoroutine
@@ -103,12 +104,15 @@ class AddFriendViewModel : ViewModel() {
     //친구 약속에 추가 항목. 약속에서 친구추가 -> 친구로드
     //지금 생각해보니 괜히 이 함수 써서 친구목록 로딩 늘린거같음 걍 위에서 FriendList 에 추가할걸
     fun loadFriends(userId: String) {
+        _friendList.value = emptyList() //초기화 추가
         _loading.value = true
         _error.value = null
+        val currentUserId = AuthQuery.getCurrentUserId()
 
         viewModelScope.launch {
             try {
-                val friendIds = FriendsQueryCoroutine.getFriends(userId)//친구 유저코드임
+                val friendIds =
+                    currentUserId?.let { FriendsQueryCoroutine.getFriends(it) }//친구 유저코드임
                 val friendsInfo = mutableListOf<User>()//어쨌든 여기 더해줘야함.
 
                 Log.d("AddFriendViewModel", "FriendIds: $friendIds")
@@ -144,12 +148,20 @@ class AddFriendViewModel : ViewModel() {
         _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
             this[friend.userCode] = true
         }
+
+        viewModelScope.launch {
+            loadFriends(myUserCode.value)
+        }
     }
 
     fun removeFriendFromYaksok(friend: User) {
         _selectedFriends.value -= friend
         _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
             this[friend.userCode] = false
+        }
+
+        viewModelScope.launch {
+            loadFriends(myUserCode.value)
         }
     }
 
@@ -158,6 +170,10 @@ class AddFriendViewModel : ViewModel() {
         _isFriendAdded.value = _isFriendAdded.value.toMutableMap().apply {
             keys.forEach { this[it] = false }
         }
+    }
+
+    fun clearFriendList() {
+        viewModelScope.launch { _friendList.value = emptyList() }
     }
 
 }

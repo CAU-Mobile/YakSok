@@ -79,11 +79,6 @@ class MainActivity : ComponentActivity() {
         val loginViewModel: LoginViewModel by viewModels()
         val checkCurrentUser = FirebaseAuth.getInstance().currentUser
         Log.d("MainActivity", "현재 로그인 상태: ${checkCurrentUser != null}")
-        val friendList = listOf(
-            "박수빈", "박예빈", "임결", "최지원", "이준우",
-            "박수빈", "박예빈", "임결", "최지원", "이준우"
-        ) //친구리스트 테스트용
-//                val loginViewModel = LoginViewModel()
 
         val registerViewModel = RegisterViewModel()
         val addFriendViewModel = AddFriendViewModel()
