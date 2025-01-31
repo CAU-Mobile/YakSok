@@ -15,7 +15,7 @@
 
 |    박수빈    |     박예빈     |    임결    |   최지원   |                                                              
 | :------------: | :-------: | :------------: | :------------: | 
-|   <img width="100px" src="https://github.com/user-attachments/assets/fe11544e-9baf-4e0d-afd7-fe9450acda2e" />    |  <img width="100px" src="" />    |    <img width="100px" src=""/>   |  <img width="100px" src=""/>  |
+|   <img width="100px" src="https://github.com/user-attachments/assets/fe11544e-9baf-4e0d-afd7-fe9450acda2e" />    |  <img width="100px" src="https://github.com/user-attachments/assets/bb3613ac-f165-43f3-85be-ff630a0ef83b"/>    |    <img width="100px" src=""/>   |  <img width="100px" src=""/>  |
 |   [@suzzang2](https://github.com/suzzang2)   |    [@yebinnnnn](https://github.com/yebinnnnn)  | [@darkpppet](https://github.com/darkpppet)  |  [@ji-circle](https://github.com/ji-circle) |
 | 중앙대학교 경영학부&소프트웨어학부 | 중앙대학교 화학공학과&소프트웨어학부 | 중앙대학교 소프트웨어학부 | 중앙대학교 심리학과&소프트웨어학부
 
