@@ -15,7 +15,7 @@
 
 |    박수빈    |     박예빈     |    임결    |   최지원   |                                                              
 | :------------: | :-------: | :------------: | :------------: | 
-|   <img width="100px" src="https://github.com/user-attachments/assets/fe11544e-9baf-4e0d-afd7-fe9450acda2e" />    |  <img width="100px" src="https://github.com/user-attachments/assets/bb3613ac-f165-43f3-85be-ff630a0ef83b"/>    |    <img width="100px" src="https://github.com/user-attachments/assets/fe1ddbe1-6819-4645-af9e-1e1684f5d0d8"/>   |  <img width="100px" src=""/>  |
+|   <img width="100px" src="https://github.com/user-attachments/assets/fe11544e-9baf-4e0d-afd7-fe9450acda2e" />    |  <img width="100px" src="https://github.com/user-attachments/assets/bb3613ac-f165-43f3-85be-ff630a0ef83b"/>    |    <img width="100px" src="https://github.com/user-attachments/assets/fe1ddbe1-6819-4645-af9e-1e1684f5d0d8"/>   |  <img width="100px" src="https://github.com/user-attachments/assets/fbb41ed7-f35a-4b0e-b046-e750e22a5b29"/>  |
 |   [@suzzang2](https://github.com/suzzang2)   |    [@yebinnnnn](https://github.com/yebinnnnn)  | [@darkpppet](https://github.com/darkpppet)  |  [@ji-circle](https://github.com/ji-circle) |
 | 중앙대학교 경영학부&소프트웨어학부 | 중앙대학교 화학공학과&소프트웨어학부 | 중앙대학교 소프트웨어학부 | 중앙대학교 심리학과&소프트웨어학부
 
@@ -87,64 +87,7 @@ For building and running the application you need:
 ## 아키텍쳐
 
 ### 디렉토리 구조
-(밑처럼 우리 거로 바꾸기)
 ```bash
-├── README.md
-├── package-lock.json
-├── package.json
-├── strapi-backend : 
-│   ├── README.md
-│   ├── api : db model, api 관련 정보 폴더
-│   │   ├── about
-│   │   ├── course
-│   │   └── lecture
-│   ├── config : 서버, 데이터베이스 관련 정보 폴더
-│   │   ├── database.js
-│   │   ├── env : 배포 환경(NODE_ENV = production) 일 때 설정 정보 폴더
-│   │   ├── functions : 프로젝트에서 실행되는 함수 관련 정보 폴더
-│   │   └── server.js
-│   ├── extensions
-│   │   └── users-permissions : 권한 정보
-│   ├── favicon.ico
-│   ├── package-lock.json
-│   ├── package.json
-│   └── public
-│       ├── robots.txt
-│       └── uploads : 강의 별 사진
-└── voluntain-app : 프론트엔드
-    ├── README.md
-    ├── components
-    │   ├── CourseCard.js
-    │   ├── Footer.js
-    │   ├── LectureCards.js
-    │   ├── MainBanner.js : 메인 페이지에 있는 남색 배너 컴포넌트, 커뮤니티 이름과 슬로건을 포함.
-    │   ├── MainCard.js
-    │   ├── MainCookieCard.js
-    │   ├── NavigationBar.js : 네비게이션 바 컴포넌트, _app.js에서 공통으로 전체 페이지에 포함됨.
-    │   ├── RecentLecture.js
-    │   └── useWindowSize.js
-    ├── config
-    │   └── next.config.js
-    ├── lib
-    │   ├── context.js
-    │   └── ga
-    ├── next.config.js
-    ├── package-lock.json
-    ├── package.json
-    ├── pages
-    │   ├── _app.js
-    │   ├── _document.js
-    │   ├── about.js
-    │   ├── course
-    │   ├── index.js
-    │   ├── lecture
-    │   ├── newcourse
-    │   ├── question.js
-    │   └── setting.js
-    ├── public
-    │   ├── favicon.ico
-    │   └── logo_about.png
-    └── styles
-        └── Home.module.css
+
 
 ```
