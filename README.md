@@ -4,7 +4,7 @@
 
 <div align="center">
 
-<img width="300" src="https://github.com/user-attachments/assets/85254b78-1d4b-418d-b7d7-ff46a9a064e0">
+<img width="300" src="https://github.com/user-attachments/assets/2cfe1209-c1d3-4ff1-8fa4-4001810f4266">
 
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FCAU-Mobile%2FYakSok&count_bg=%2379CFFF&title_bg=%23F3F3F3&icon=&icon_color=%23FFFFFF&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
